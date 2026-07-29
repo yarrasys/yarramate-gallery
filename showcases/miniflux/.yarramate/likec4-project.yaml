@@ -2,13 +2,13 @@ format: yarramate/likec4-project/v1
 id: miniflux
 version: "1.0"
 title: Miniflux architecture
-mapping: .yarramate/integrations/likec4/subject-mapping.yaml
+mapping: integrations/likec4/subject-mapping.yaml
 views:
-  - projection: .yarramate/projections/system-overview.yaml
-  - projection: .yarramate/projections/http-surfaces.yaml
-  - projection: .yarramate/projections/persistence.yaml
+  - projection: projections/system-overview.yaml
+  - projection: projections/http-surfaces.yaml
+  - projection: projections/persistence.yaml
   - id: feed-refresh-flow
-    projection: .yarramate/projections/feed-refresh-flow.yaml
+    projection: projections/feed-refresh-flow.yaml
     dynamic:
       steps:
         - relationship: miniflux#scheduler-selects-due-feeds
@@ -19,7 +19,7 @@ views:
         - relationship: miniflux#pipeline-notifies-integrations
         - relationship: miniflux#hub-delivers-entries
   - id: save-entry-flow
-    projection: .yarramate/projections/save-entry-flow.yaml
+    projection: projections/save-entry-flow.yaml
     dynamic:
       steps:
         - relationship: miniflux#reader-saves-entry

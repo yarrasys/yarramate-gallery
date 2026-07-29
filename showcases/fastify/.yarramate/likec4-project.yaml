@@ -2,11 +2,11 @@ format: yarramate/likec4-project/v1
 id: fastify
 version: "1.0"
 title: Fastify architecture
-mapping: .yarramate/integrations/likec4/subject-mapping.yaml
+mapping: integrations/likec4/subject-mapping.yaml
 views:
-  - projection: .yarramate/projections/framework-overview.yaml
+  - projection: projections/framework-overview.yaml
   - id: request-lifecycle
-    projection: .yarramate/projections/request-lifecycle.yaml
+    projection: projections/request-lifecycle.yaml
     dynamic:
       steps:
         - relationship: fastify#accept-triggers-routing
@@ -17,7 +17,7 @@ views:
         - relationship: fastify#handler-triggers-serialization
         - relationship: fastify#serialization-triggers-respond
   - id: plugin-registration
-    projection: .yarramate/projections/plugin-registration.yaml
+    projection: projections/plugin-registration.yaml
     dynamic:
       steps:
         - relationship: fastify#api-triggers-register
