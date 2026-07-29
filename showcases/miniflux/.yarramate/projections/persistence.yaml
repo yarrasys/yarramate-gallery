@@ -1,0 +1,17 @@
+format: yarramate/projection/v1
+id: persistence
+version: "1.0"
+query:
+  subjects:
+    - miniflux#storage
+    - miniflux#postgresql
+    - miniflux#feed
+    - miniflux#entry
+    - miniflux#user-account
+  relationships: between
+presentation:
+  title: Persistence and principal information
+  description: >-
+    The storage layer owns all SQL against PostgreSQL and manages the three
+    principal information objects: feed subscriptions, entries, and user
+    accounts.

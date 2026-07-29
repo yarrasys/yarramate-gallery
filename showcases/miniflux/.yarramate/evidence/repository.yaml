@@ -1,0 +1,180 @@
+format: yarramate/evidence/v1
+id: miniflux-repository
+version: "1.0"
+provider: repository-inspection
+observations:
+  # --- Concepts ---
+  - subject: miniflux#miniflux-server
+    result: confirmed
+    evidence:
+      uri: repo:main.go
+      message: Single entrypoint delegating to internal/cli; daemon wiring in internal/cli/daemon.go.
+  - subject: miniflux#web-ui
+    result: confirmed
+    evidence:
+      uri: repo:internal/ui
+      message: Catch-all route in internal/http/server/routes.go serves ui.Serve(store, pool).
+  - subject: miniflux#rest-api
+    result: confirmed
+    evidence:
+      uri: repo:internal/api
+      message: Mounted at /v1/ in internal/http/server/routes.go when the API service is enabled.
+  - subject: miniflux#fever-api
+    result: confirmed
+    evidence:
+      uri: repo:internal/fever
+      message: Mounted at /fever/ in internal/http/server/routes.go.
+  - subject: miniflux#greader-api
+    result: confirmed
+    evidence:
+      uri: repo:internal/googlereader
+      message: Mounted at /reader/api/0/ and /accounts/ClientLogin in internal/http/server/routes.go.
+  - subject: miniflux#media-proxy
+    result: confirmed
+    evidence:
+      uri: repo:internal/mediaproxy
+  - subject: miniflux#feed-scheduler
+    result: confirmed
+    evidence:
+      uri: repo:internal/cli/scheduler.go
+      message: feedScheduler ticks at the configured polling frequency; cleanupScheduler runs maintenance.
+  - subject: miniflux#worker-pool
+    result: confirmed
+    evidence:
+      uri: repo:internal/worker/pool.go
+  - subject: miniflux#feed-pipeline
+    result: confirmed
+    evidence:
+      uri: repo:internal/reader/handler/handler.go
+      message: RefreshFeed orchestrates fetcher, parser, processor, icon checker, and storage.
+  - subject: miniflux#integration-hub
+    result: confirmed
+    evidence:
+      uri: repo:internal/integration/integration.go
+      message: SendEntry and PushEntries fan out to ~30 provider client packages.
+  - subject: miniflux#storage
+    result: confirmed
+    evidence:
+      uri: repo:internal/storage/storage.go
+  - subject: miniflux#postgresql
+    result: confirmed
+    evidence:
+      uri: repo:internal/database/postgresql.go
+      message: lib/pq driver in go.mod; migrations in internal/database/migrations.go.
+  - subject: miniflux#feed
+    result: confirmed
+    evidence:
+      uri: repo:internal/model/feed.go
+  - subject: miniflux#entry
+    result: confirmed
+    evidence:
+      uri: repo:internal/model/entry.go
+  - subject: miniflux#user-account
+    result: confirmed
+    evidence:
+      uri: repo:internal/model/user.go
+  - subject: miniflux#reader
+    result: confirmed
+    evidence:
+      uri: repo:README.md
+      message: Product documentation describes a feed reader operated by end users; the actor itself is an interpretation.
+  - subject: miniflux#client-app
+    result: confirmed
+    evidence:
+      uri: repo:client
+      message: Bundled Go API client plus Fever and Google Reader compatibility APIs imply external client apps.
+  - subject: miniflux#feed-publisher
+    result: confirmed
+    evidence:
+      uri: repo:internal/reader/fetcher/request_builder.go
+      message: Outbound HTTP requests to arbitrary feed URLs.
+  - subject: miniflux#integration-target
+    result: confirmed
+    evidence:
+      uri: repo:internal/integration
+      message: One client package per external service (wallabag, pinboard, telegrambot, ntfy, webhook, ...).
+  - subject: miniflux#oidc-provider
+    result: confirmed
+    evidence:
+      uri: repo:internal/oauth2/oidc.go
+      message: Optional Google/OIDC authentication; UI callbacks in internal/ui/oauth2_callback.go.
+
+  # --- Key claims ---
+  - claim: miniflux#scheduler-selects-due-feeds
+    result: confirmed
+    evidence:
+      uri: repo:internal/storage/batch.go
+      message: Batch builder with WithNextCheckExpired, WithoutDisabledFeeds, WithLimitPerHost.
+  - claim: miniflux#scheduler-dispatches-jobs
+    result: confirmed
+    evidence:
+      uri: repo:internal/cli/scheduler.go
+      message: pool.Push(jobs) on every polling tick.
+  - claim: miniflux#pool-runs-refresh
+    result: confirmed
+    evidence:
+      uri: repo:internal/worker/worker.go
+      message: feedHandler.RefreshFeed(w.store, job.UserID, job.FeedID, false).
+  - claim: miniflux#publisher-supplies-feeds
+    result: confirmed
+    evidence:
+      uri: repo:internal/reader/handler/handler.go
+      message: fetcher.NewRequestBuilder ... ExecuteRequest(originalFeed.FeedURL) with ETag/Last-Modified handling.
+  - claim: miniflux#pipeline-stores-entries
+    result: confirmed
+    evidence:
+      uri: repo:internal/reader/handler/handler.go
+      message: store.RefreshFeedEntries(...) after processor.ProcessFeedEntries.
+  - claim: miniflux#pipeline-notifies-integrations
+    result: confirmed
+    evidence:
+      uri: repo:internal/reader/handler/handler.go
+      message: go integration.PushEntries(originalFeed, newEntries, userIntegrations) when new entries exist.
+  - claim: miniflux#hub-delivers-entries
+    result: confirmed
+    evidence:
+      uri: repo:internal/integration/integration.go
+  - claim: miniflux#webui-sends-saved-entry
+    result: confirmed
+    evidence:
+      uri: repo:internal/ui/entry_save.go
+      message: go integration.SendEntry(entry, userIntegrations).
+  - claim: miniflux#webui-enqueues-refresh
+    result: confirmed
+    evidence:
+      uri: repo:internal/ui/feed_refresh.go
+      message: go h.pool.Push(jobs); also category_refresh.go.
+  - claim: miniflux#restapi-enqueues-refresh
+    result: confirmed
+    evidence:
+      uri: repo:internal/api/feed_handlers.go
+      message: go h.pool.Push(jobs); also category_handlers.go.
+  - claim: miniflux#pg-serves-storage
+    result: confirmed
+    evidence:
+      uri: repo:internal/database/postgresql.go
+  - claim: miniflux#storage-manages-entries
+    result: confirmed
+    evidence:
+      uri: repo:internal/storage/entry.go
+  - claim: miniflux#storage-manages-feeds
+    result: confirmed
+    evidence:
+      uri: repo:internal/storage/feed.go
+  - claim: miniflux#storage-manages-users
+    result: confirmed
+    evidence:
+      uri: repo:internal/storage/user.go
+  - claim: miniflux#oidc-serves-webui
+    result: confirmed
+    evidence:
+      uri: repo:internal/oauth2/manager.go
+  - claim: miniflux#mediaproxy-serves-reader
+    result: confirmed
+    evidence:
+      uri: repo:internal/mediaproxy/rewriter.go
+  - claim: miniflux#reader-uses-clients
+    result: unknown
+    evidence:
+      uri: repo:client/README.md
+      message: Which clients readers actually use is not observable from the repository; the compatibility APIs only imply it.

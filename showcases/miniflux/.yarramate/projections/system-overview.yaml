@@ -1,0 +1,31 @@
+format: yarramate/projection/v1
+id: system-overview
+version: "1.0"
+query:
+  subjects:
+    - miniflux#reader
+    - miniflux#client-app
+    - miniflux#feed-publisher
+    - miniflux#integration-target
+    - miniflux#oidc-provider
+    - miniflux#miniflux-server
+    - miniflux#web-ui
+    - miniflux#rest-api
+    - miniflux#fever-api
+    - miniflux#greader-api
+    - miniflux#media-proxy
+    - miniflux#feed-scheduler
+    - miniflux#worker-pool
+    - miniflux#feed-pipeline
+    - miniflux#integration-hub
+    - miniflux#storage
+    - miniflux#postgresql
+    - miniflux#feed
+    - miniflux#entry
+    - miniflux#user-account
+  relationships: between
+presentation:
+  title: Miniflux system overview
+  description: >-
+    Repository orientation: the single Miniflux daemon, its internal parts,
+    the people and external systems around it, and its principal information.
