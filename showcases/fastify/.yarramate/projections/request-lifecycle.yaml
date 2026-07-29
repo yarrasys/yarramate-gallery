@@ -1,0 +1,17 @@
+format: yarramate/projection/v1
+id: request-lifecycle
+version: "1.0"
+query:
+  subjects:
+    - fastify#fn-accept
+    - fastify#fn-routing
+    - fastify#fn-request-hooks
+    - fastify#fn-parsing
+    - fastify#fn-validation
+    - fastify#route-handler
+    - fastify#fn-serialization
+    - fastify#fn-respond
+    - fastify#fn-not-found
+  relationships: between
+presentation:
+  title: Request lifecycle

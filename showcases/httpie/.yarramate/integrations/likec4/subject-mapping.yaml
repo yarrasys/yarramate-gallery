@@ -1,0 +1,116 @@
+format: yarramate/adapter-mapping/v1
+id: httpie-likec4
+version: "1.0"
+adapter: likec4
+mappings:
+  - native: httpie#arg-parser
+    external: argParser
+    type: concept
+  - native: httpie#builder-feeds-downloader
+    external: builderFeedsDownloader
+    type: relationship
+  - native: httpie#builder-streams-messages
+    external: builderStreamsMessages
+    type: relationship
+  - native: httpie#builder-uses-requests
+    external: builderUsesRequests
+    type: relationship
+  - native: httpie#cli-has-arg-parser
+    external: cliHasArgParser
+    type: relationship
+  - native: httpie#cli-has-download-manager
+    external: cliHasDownloadManager
+    type: relationship
+  - native: httpie#cli-has-output-pipeline
+    external: cliHasOutputPipeline
+    type: relationship
+  - native: httpie#cli-has-plugin-manager
+    external: cliHasPluginManager
+    type: relationship
+  - native: httpie#cli-has-request-builder
+    external: cliHasRequestBuilder
+    type: relationship
+  - native: httpie#cli-has-session-manager
+    external: cliHasSessionManager
+    type: relationship
+  - native: httpie#cli-parses-args
+    external: cliParsesArgs
+    type: relationship
+  - native: httpie#cli-reads-config
+    external: cliReadsConfig
+    type: relationship
+  - native: httpie#config-file
+    external: configFile
+    type: concept
+  - native: httpie#download-manager
+    external: downloadManager
+    type: concept
+  - native: httpie#downloaded-file
+    external: downloadedFile
+    type: concept
+  - native: httpie#downloader-writes-file
+    external: downloaderWritesFile
+    type: relationship
+  - native: httpie#http-cli
+    external: httpCli
+    type: concept
+  - native: httpie#manager-cli
+    external: managerCli
+    type: concept
+  - native: httpie#manager-influences-plugins
+    external: managerInfluencesPlugins
+    type: relationship
+  - native: httpie#output-pipeline
+    external: outputPipeline
+    type: concept
+  - native: httpie#output-renders-to-user
+    external: outputRendersToUser
+    type: relationship
+  - native: httpie#parser-feeds-builder
+    external: parserFeedsBuilder
+    type: relationship
+  - native: httpie#plugin-manager
+    external: pluginManager
+    type: concept
+  - native: httpie#plugins-serve-cli
+    external: pluginsServeCli
+    type: relationship
+  - native: httpie#pygments-lib
+    external: pygmentsLib
+    type: concept
+  - native: httpie#pygments-serves-output
+    external: pygmentsServesOutput
+    type: relationship
+  - native: httpie#remote-server
+    external: remoteServer
+    type: concept
+  - native: httpie#request-builder
+    external: requestBuilder
+    type: concept
+  - native: httpie#requests-exchanges-with-server
+    external: requestsExchangesWithServer
+    type: relationship
+  - native: httpie#requests-lib
+    external: requestsLib
+    type: concept
+  - native: httpie#session-accesses-store
+    external: sessionAccessesStore
+    type: relationship
+  - native: httpie#session-manager
+    external: sessionManager
+    type: concept
+  - native: httpie#session-serves-builder
+    external: sessionServesBuilder
+    type: relationship
+  - native: httpie#session-store
+    external: sessionStore
+    type: concept
+  - native: httpie#terminal-user
+    external: terminalUser
+    type: concept
+  - native: httpie#user-invokes-cli
+    external: userInvokesCli
+    type: relationship
+  - native: httpie#user-invokes-manager
+    external: userInvokesManager
+    type: relationship

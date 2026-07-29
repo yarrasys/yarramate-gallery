@@ -1,0 +1,28 @@
+{
+  "format": "yarramate/likec4-generated-project/v2",
+  "project": "httpie@1.0",
+  "mapping": "httpie-likec4@1.0",
+  "views": [
+    {
+      "projection": "httpie-orientation@1.0"
+    },
+    {
+      "id": "request-flow",
+      "projection": "request-flow@1.0"
+    },
+    {
+      "id": "download-flow",
+      "projection": "download-flow@1.0"
+    }
+  ],
+  "files": [
+    "likec4.config.json",
+    "model.likec4",
+    "specification.likec4"
+  ],
+  "digests": {
+    "likec4.config.json": "9a8dae368a78328505931631175c66d3fca24eec8e958dc632cc1301bd91daaa",
+    "model.likec4": "529c846e6ed2bbb7f5b1e3f82048cad81f92c1473688ad20525599594c0bbba3",
+    "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  }
+}

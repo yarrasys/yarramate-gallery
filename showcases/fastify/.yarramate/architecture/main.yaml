@@ -1,0 +1,473 @@
+format: yarramate/v1
+id: fastify
+profile: yarramate/core@0.1
+concepts:
+  # --- Actors / consumers -------------------------------------------------
+  - id: app-developer
+    kind: businessActor
+    name: Application developer
+    description: >-
+      Consumer of the framework. Interpretation: fastify is a library, so its
+      only architecturally significant actor is the developer who builds HTTP
+      applications and plugins against the public API (documented in README.md
+      and docs/Guides).
+
+  # --- Public API surface -------------------------------------------------
+  - id: public-api
+    kind: applicationService
+    name: Fastify instance API
+    description: >-
+      Observed developer-facing surface: the fastify() factory plus instance
+      methods for route registration (get/post/route), plugin registration
+      (register), decoration (decorate), hooks (addHook), schemas (addSchema),
+      lifecycle (listen/ready/close), and test injection (inject). Assembled in
+      fastify.js lines 120-300 and typed in fastify.d.ts.
+
+  # --- Framework grouping -------------------------------------------------
+  - id: framework
+    kind: applicationComponent
+    name: Fastify framework
+    description: >-
+      Interpretation: grouping for the framework core published as the npm
+      package "fastify" (package.json). All internal subsystems live under
+      fastify.js and lib/.
+
+  # --- Core subsystems ----------------------------------------------------
+  - id: instance-factory
+    kind: applicationComponent
+    name: Instance factory
+    description: >-
+      Observed in fastify.js: builds each Fastify instance, wires router, 404
+      handling, server, schema controller, hooks, logging and avvio boot, and
+      exposes the public API object.
+  - id: router
+    kind: applicationComponent
+    name: Router
+    description: >-
+      Observed in lib/route.js: registers routes, compiles per-route Context
+      objects, and dispatches incoming requests through find-my-way lookup.
+  - id: hook-system
+    kind: applicationComponent
+    name: Hook system
+    description: >-
+      Observed in lib/hooks.js: ten request/reply lifecycle hooks (onRequest,
+      preParsing, preValidation, preHandler, preSerialization, onSend,
+      onResponse, onError, onTimeout, onRequestAbort) and six application hooks
+      (onRoute, onRegister, onReady, onListen, preClose, onClose), with hook
+      runner functions used by routing and reply.
+  - id: plugin-engine
+    kind: applicationComponent
+    name: Plugin engine and encapsulation
+    description: >-
+      Observed: avvio drives plugin boot (fastify.js:360-378) and
+      lib/plugin-override.js implements encapsulation by creating a child
+      instance per plugin with copied hooks, schema controller, content-type
+      parser, Request/Reply prototypes, route prefix and log level.
+  - id: content-type-parser
+    kind: applicationComponent
+    name: Content-type parser
+    description: >-
+      Observed in lib/content-type-parser.js: per-content-type body parsers,
+      selected and run during the parsing phase of the request lifecycle;
+      customizable via addContentTypeParser.
+  - id: schema-engine
+    kind: applicationComponent
+    name: Schema engine
+    description: >-
+      Observed in lib/schema-controller.js, lib/schemas.js and
+      lib/validation.js: stores shared JSON schemas, builds validator and
+      serializer compilers (Ajv and fast-json-stringify by default, replaceable
+      via compilersFactory), and validates params/body/querystring/headers.
+  - id: request-reply
+    kind: applicationComponent
+    name: Request/Reply layer
+    description: >-
+      Observed in lib/request.js and lib/reply.js: per-request Request and
+      Reply abstractions over the raw Node objects; Reply drives
+      preSerialization/onSend hooks, response serialization and writing the
+      payload to the raw response.
+  - id: logging
+    kind: applicationComponent
+    name: Logging integration
+    description: >-
+      Observed in lib/logger-factory.js and lib/logger-pino.js: builds the root
+      pino logger (or abstract-logging no-op), request-scoped child loggers via
+      a replaceable childLoggerFactory, and per-instance log levels.
+  - id: server-adapter
+    kind: applicationComponent
+    name: Server adapter
+    description: >-
+      Observed in lib/server.js: creates and manages node:http, node:https or
+      node:http2 servers, binds the routing handler, and implements
+      listen/close semantics including keep-alive connection tracking.
+  - id: error-handling
+    kind: applicationComponent
+    name: Error handling and 404
+    description: >-
+      Observed in lib/error-handler.js, lib/errors.js, lib/error-serializer.js
+      and lib/four-oh-four.js: coded FST_ERR errors, encapsulated
+      setErrorHandler chains, and a dedicated 404 router supporting
+      encapsulated not-found handlers.
+
+  # --- Request lifecycle behavior (ordered flow) ---------------------------
+  - id: fn-accept
+    kind: applicationFunction
+    name: Request acceptance
+    description: >-
+      Observed: socket-level acceptance of the HTTP request by the Node server
+      created in lib/server.js, which passes it to the bound routing handler
+      (fastify.js:106,115).
+  - id: fn-routing
+    kind: applicationFunction
+    name: Routing
+    description: >-
+      Observed: find-my-way lookup selects the route and its compiled Context
+      (lib/route.js:114).
+  - id: fn-request-hooks
+    kind: applicationFunction
+    name: Request hook execution
+    description: >-
+      Observed: the onRequest hook chain runs after route match, followed by
+      preParsing (lib/route.js:560-566,654).
+  - id: fn-parsing
+    kind: applicationFunction
+    name: Body parsing
+    description: >-
+      Observed: the parser registered for the request content type consumes the
+      body (lib/handle-request.js:74, lib/content-type-parser.js).
+  - id: fn-validation
+    kind: applicationFunction
+    name: Request validation
+    description: >-
+      Observed: preValidation hooks then compiled schema validation of
+      params/body/querystring/headers (lib/handle-request.js validateSchema,
+      lib/validation.js:57-79).
+  - id: route-handler
+    kind: applicationFunction
+    name: Handler execution (user-supplied)
+    description: >-
+      Interpretation: the preHandler hook chain followed by the
+      developer-supplied handler. The handler is not part of the framework
+      source; the framework only invokes it (lib/handle-request.js
+      preHandlerHookRunner) and documents its contract
+      (docs/Reference/Routes.md).
+  - id: fn-serialization
+    kind: applicationFunction
+    name: Response serialization
+    description: >-
+      Observed: preSerialization hooks run and the compiled response serializer
+      renders the payload (lib/reply.js:207,348-378).
+  - id: fn-respond
+    kind: applicationFunction
+    name: Response dispatch
+    description: >-
+      Observed: onSend hooks run, the payload is written to the raw Node
+      response owned by the server (lib/reply.js:167,340), then onResponse
+      hooks fire.
+  - id: fn-not-found
+    kind: applicationFunction
+    name: Not-found handling
+    description: >-
+      Observed: unmatched requests fall through to the dedicated 404 router
+      with encapsulated not-found handlers (fastify.js:102-103,
+      lib/four-oh-four.js).
+
+  # --- Plugin registration behavior (ordered flow) -------------------------
+  - id: fn-register
+    kind: applicationFunction
+    name: Plugin registration
+    description: >-
+      Observed: register(plugin, opts) queues the plugin on the avvio boot
+      queue; avvio's override callback performs encapsulation
+      (fastify.js:360-378, lib/plugin-override.js).
+  - id: fn-app-hooks
+    kind: applicationFunction
+    name: Application hook execution
+    description: >-
+      Observed: onRegister fires per encapsulated instance
+      (lib/plugin-override.js:71); onReady/onListen/preClose/onClose run around
+      boot and shutdown (lib/hooks.js applicationHooks).
+
+  # --- External dependencies that matter architecturally ------------------
+  - id: dep-find-my-way
+    kind: applicationComponent
+    name: find-my-way (external)
+    description: Radix-tree HTTP router; declared in package.json, required by lib/route.js and lib/four-oh-four.js.
+  - id: dep-avvio
+    kind: applicationComponent
+    name: avvio (external)
+    description: Boot and plugin-loading orchestrator; declared in package.json, installed in fastify.js with a custom override that performs encapsulation.
+  - id: dep-pino
+    kind: applicationComponent
+    name: pino (external)
+    description: Structured logger; declared in package.json, wrapped by lib/logger-pino.js.
+  - id: dep-ajv
+    kind: applicationComponent
+    name: "@fastify/ajv-compiler (external)"
+    description: Default validator compiler factory (Ajv); lazily required in lib/schema-controller.js.
+  - id: dep-fjs
+    kind: applicationComponent
+    name: "@fastify/fast-json-stringify-compiler (external)"
+    description: Default response serializer compiler factory (fast-json-stringify); lazily required in lib/schema-controller.js.
+  - id: dep-light-my-request
+    kind: applicationComponent
+    name: light-my-request (external)
+    description: HTTP injection used by fastify.inject() for server-less testing; lazily required in fastify.js.
+  - id: node-http
+    kind: applicationComponent
+    name: Node.js core HTTP servers
+    description: node:http, node:https and node:http2 modules that provide the actual socket servers and raw request/response objects (lib/server.js).
+
+  # --- Principal information ----------------------------------------------
+  - id: route-definition
+    kind: dataObject
+    name: Route definition and context
+    description: >-
+      Observed: route options (method, url, schema, handler, per-route hooks)
+      compiled into a per-route Context (lib/context.js) stored in the router
+      and carried on each request as kRouteContext.
+  - id: json-schemas
+    kind: dataObject
+    name: JSON schemas
+    description: >-
+      Observed: shared schemas added via addSchema plus per-route
+      body/querystring/params/headers/response schemas, bucketed per
+      encapsulation context and compiled into validators and serializers
+      (lib/schema-controller.js, lib/schemas.js).
+  - id: encapsulation-context
+    kind: dataObject
+    name: Encapsulation context state
+    description: >-
+      Observed: the per-plugin child-instance state created by
+      lib/plugin-override.js — copied hook chains, schema controller bucket,
+      content-type parsers, Request/Reply prototypes, route prefix, plugin name
+      chain and log level — giving each plugin an isolated context.
+
+relationships:
+  # --- Grouping (interpretation: module layout under lib/) -----------------
+  - id: framework-has-factory
+    kind: composition
+    from: framework
+    to: instance-factory
+  - id: framework-has-router
+    kind: composition
+    from: framework
+    to: router
+  - id: framework-has-hooks
+    kind: composition
+    from: framework
+    to: hook-system
+  - id: framework-has-plugin-engine
+    kind: composition
+    from: framework
+    to: plugin-engine
+  - id: framework-has-ctp
+    kind: composition
+    from: framework
+    to: content-type-parser
+  - id: framework-has-schema-engine
+    kind: composition
+    from: framework
+    to: schema-engine
+  - id: framework-has-request-reply
+    kind: composition
+    from: framework
+    to: request-reply
+  - id: framework-has-logging
+    kind: composition
+    from: framework
+    to: logging
+  - id: framework-has-server-adapter
+    kind: composition
+    from: framework
+    to: server-adapter
+  - id: framework-has-error-handling
+    kind: composition
+    from: framework
+    to: error-handling
+
+  # --- API surface ---------------------------------------------------------
+  - id: factory-realizes-api
+    kind: realization
+    from: instance-factory
+    to: public-api
+    description: fastify.js assembles the instance object that constitutes the public API (fastify.js:120-300).
+  - id: api-serves-developer
+    kind: serving
+    from: public-api
+    to: app-developer
+    description: Developers build applications and plugins exclusively through the instance API (README.md quick start, docs/Reference).
+  - id: developer-supplies-handlers
+    kind: assignment
+    from: app-developer
+    to: route-handler
+    description: Handlers are user code attached per route via the route registration API (docs/Reference/Routes.md).
+
+  # --- External dependency serving ----------------------------------------
+  - id: fmw-serves-router
+    kind: serving
+    from: dep-find-my-way
+    to: router
+    description: Radix-tree matching, constraints and lookup (lib/route.js:3,78).
+  - id: avvio-serves-plugin-engine
+    kind: serving
+    from: dep-avvio
+    to: plugin-engine
+    description: Boot queue, plugin timeouts and override hook (fastify.js:360-378).
+  - id: pino-serves-logging
+    kind: serving
+    from: dep-pino
+    to: logging
+    description: Root and child structured loggers (lib/logger-pino.js:9).
+  - id: ajv-serves-schema
+    kind: serving
+    from: dep-ajv
+    to: schema-engine
+    description: Default validator compiler, lazily loaded (lib/schema-controller.js:22).
+  - id: fjs-serves-schema
+    kind: serving
+    from: dep-fjs
+    to: schema-engine
+    description: Default serializer compiler, lazily loaded (lib/schema-controller.js:26).
+  - id: lmr-serves-factory
+    kind: serving
+    from: dep-light-my-request
+    to: instance-factory
+    description: Implements inject() fake HTTP requests, lazily loaded (fastify.js:475-480).
+  - id: nodehttp-serves-server
+    kind: serving
+    from: node-http
+    to: server-adapter
+    description: Socket servers and raw req/res objects (lib/server.js:3-5,315-320).
+  - id: schema-serves-reply
+    kind: serving
+    from: schema-engine
+    to: request-reply
+    description: Provides compiled response serializers resolved through the route context (lib/reply.js:372-378).
+  - id: errors-serve-reply
+    kind: serving
+    from: error-handling
+    to: request-reply
+    description: Thrown or passed errors are routed through the encapsulated error handler chain and error serializer before sending (lib/error-handler.js, lib/error-serializer.js).
+
+  # --- Behavior assignment (which subsystem performs which phase) ----------
+  - id: server-performs-accept
+    kind: assignment
+    from: server-adapter
+    to: fn-accept
+  - id: router-performs-routing
+    kind: assignment
+    from: router
+    to: fn-routing
+  - id: hooks-perform-request-hooks
+    kind: assignment
+    from: hook-system
+    to: fn-request-hooks
+  - id: ctp-performs-parsing
+    kind: assignment
+    from: content-type-parser
+    to: fn-parsing
+  - id: schema-performs-validation
+    kind: assignment
+    from: schema-engine
+    to: fn-validation
+  - id: reply-performs-serialization
+    kind: assignment
+    from: request-reply
+    to: fn-serialization
+  - id: reply-performs-respond
+    kind: assignment
+    from: request-reply
+    to: fn-respond
+  - id: errors-perform-not-found
+    kind: assignment
+    from: error-handling
+    to: fn-not-found
+  - id: plugin-engine-performs-register
+    kind: assignment
+    from: plugin-engine
+    to: fn-register
+  - id: hooks-perform-app-hooks
+    kind: assignment
+    from: hook-system
+    to: fn-app-hooks
+
+  # --- Request lifecycle transitions (ordered flow) ------------------------
+  - id: accept-triggers-routing
+    kind: triggering
+    from: fn-accept
+    to: fn-routing
+    description: The server passes each accepted request to router lookup via the wrapped routing handler (fastify.js:106, lib/route.js:114).
+  - id: routing-triggers-request-hooks
+    kind: triggering
+    from: fn-routing
+    to: fn-request-hooks
+    description: After route match, the onRequest hook chain starts (lib/route.js:560-566).
+  - id: request-hooks-trigger-parsing
+    kind: triggering
+    from: fn-request-hooks
+    to: fn-parsing
+    description: After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:74).
+  - id: parsing-triggers-validation
+    kind: triggering
+    from: fn-parsing
+    to: fn-validation
+    description: The parsed body enters preValidation and compiled schema validation (lib/handle-request.js validateSchema).
+  - id: validation-triggers-handler
+    kind: triggering
+    from: fn-validation
+    to: route-handler
+    description: On successful validation, the preHandler chain runs and the user handler is invoked (lib/handle-request.js preHandlerHookRunner).
+  - id: handler-triggers-serialization
+    kind: triggering
+    from: route-handler
+    to: fn-serialization
+    description: The handler result (reply.send or async return wrapped by lib/wrap-thenable.js) enters preSerialization and serialization (lib/reply.js:207,227).
+  - id: serialization-triggers-respond
+    kind: triggering
+    from: fn-serialization
+    to: fn-respond
+    description: The serialized payload passes through onSend hooks and is written to the raw response (lib/reply.js:167,232,340).
+  - id: routing-triggers-not-found
+    kind: triggering
+    from: fn-routing
+    to: fn-not-found
+    description: Error branch — requests matching no route are dispatched to the encapsulated 404 handler (fastify.js:102-103, lib/four-oh-four.js).
+
+  # --- Plugin registration transitions (ordered flow) ----------------------
+  - id: api-triggers-register
+    kind: triggering
+    from: public-api
+    to: fn-register
+    description: register(plugin, opts) queues the plugin on the avvio boot queue (fastify.js:360-378).
+  - id: register-creates-context
+    kind: access
+    from: fn-register
+    to: encapsulation-context
+    mode: read-write
+    description: The avvio override creates an encapsulated child instance with copied hooks, schemas, parsers and prototypes (lib/plugin-override.js:39-51).
+  - id: register-fires-app-hooks
+    kind: triggering
+    from: fn-register
+    to: fn-app-hooks
+    description: onRegister hooks fire for every new encapsulated instance (lib/plugin-override.js:71).
+
+  # --- Principal information access ----------------------------------------
+  - id: router-stores-routes
+    kind: access
+    from: router
+    to: route-definition
+    mode: read-write
+    description: Route registration compiles options into a per-route Context stored in find-my-way (lib/route.js:356-361, lib/context.js).
+  - id: lifecycle-reads-routes
+    kind: access
+    from: request-reply
+    to: route-definition
+    mode: read
+    description: Request handling resolves hooks, parsers and serializers through kRouteContext (lib/handle-request.js:74).
+  - id: schema-stores-schemas
+    kind: access
+    from: schema-engine
+    to: json-schemas
+    mode: read-write
+    description: addSchema buckets shared schemas per encapsulation context and compiles them (lib/schema-controller.js, lib/schemas.js).

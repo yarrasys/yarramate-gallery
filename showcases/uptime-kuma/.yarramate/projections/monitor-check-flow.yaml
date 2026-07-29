@@ -1,0 +1,20 @@
+format: yarramate/projection/v1
+id: monitor-check-flow
+version: "1.0"
+query:
+  subjects:
+    - uptime-kuma#server-core
+    - uptime-kuma#monitor-engine
+    - uptime-kuma#monitored-target
+    - uptime-kuma#heartbeat-history
+    - uptime-kuma#notification-hub
+    - uptime-kuma#notification-channel
+    - uptime-kuma#web-app
+  relationships: between
+presentation:
+  title: Monitor check to notification flow
+  description: >-
+    Ordered flow of an active check: the server starts the check loop, the
+    engine probes the target, records the heartbeat, triggers notifications on
+    status change, providers deliver alerts, and live results stream to the
+    dashboard.

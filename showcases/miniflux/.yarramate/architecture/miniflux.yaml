@@ -1,0 +1,342 @@
+format: yarramate/v1
+id: miniflux
+profile: yarramate/core@0.1
+concepts:
+  # --- Actors and external parties (interpretation supported by repository docs) ---
+  - id: reader
+    kind: businessActor
+    name: Reader
+    status: current
+    description: >-
+      Person who subscribes to feeds and reads, stars, and saves entries
+      through the Miniflux web interface.
+  - id: client-app
+    kind: applicationComponent
+    name: Third-party client app
+    status: current
+    description: >-
+      External feed-reader clients that talk to Miniflux through the REST API,
+      the Fever-compatible API, or the Google Reader-compatible API.
+  - id: feed-publisher
+    kind: applicationComponent
+    name: Feed publisher
+    status: current
+    description: >-
+      External website that publishes an Atom, RSS, RDF, or JSON Feed document
+      over HTTP.
+  - id: integration-target
+    kind: applicationComponent
+    name: Third-party integration service
+    status: current
+    description: >-
+      External read-later, bookmarking, and notification services (for example
+      Wallabag, Pinboard, Telegram, ntfy, webhooks) that receive entries from
+      Miniflux.
+  - id: oidc-provider
+    kind: applicationComponent
+    name: OIDC / OAuth2 provider
+    status: current
+    description: >-
+      Optional external identity provider (Google or any OpenID Connect
+      issuer) used to authenticate readers.
+
+  # --- The Miniflux server and its internally observed parts ---
+  - id: miniflux-server
+    kind: applicationComponent
+    name: Miniflux server
+    status: current
+    description: >-
+      Single Go binary (module miniflux.app/v2) that runs the HTTP server, the
+      background scheduler, and the worker pool as one daemon process.
+  - id: web-ui
+    kind: applicationComponent
+    name: Web UI
+    status: current
+    description: >-
+      Server-rendered HTML interface (internal/ui) for reading, organizing,
+      and saving entries; the catch-all route of the HTTP server.
+  - id: rest-api
+    kind: applicationComponent
+    name: REST API
+    status: current
+    description: >-
+      JSON API under /v1/ (internal/api) for programmatic feed, entry, and
+      user management.
+  - id: fever-api
+    kind: applicationComponent
+    name: Fever-compatible API
+    status: current
+    description: >-
+      Fever protocol endpoint under /fever/ (internal/fever) for legacy
+      third-party reader clients.
+  - id: greader-api
+    kind: applicationComponent
+    name: Google Reader-compatible API
+    status: current
+    description: >-
+      Google Reader protocol endpoints under /reader/api/0/
+      (internal/googlereader) for third-party reader clients.
+  - id: media-proxy
+    kind: applicationComponent
+    name: Media proxy
+    status: current
+    description: >-
+      Rewrites and proxies external media URLs (internal/mediaproxy) to avoid
+      tracking and mixed-content warnings.
+  - id: feed-scheduler
+    kind: applicationComponent
+    name: Feed scheduler
+    status: current
+    description: >-
+      Background ticker (internal/cli/scheduler.go) that periodically selects
+      batches of due feeds and dispatches refresh jobs.
+  - id: worker-pool
+    kind: applicationComponent
+    name: Worker pool
+    status: current
+    description: >-
+      Fixed-size pool of goroutine workers (internal/worker) that execute feed
+      refresh jobs from the scheduler, the Web UI, and the REST API.
+  - id: feed-pipeline
+    kind: applicationComponent
+    name: Feed fetching pipeline
+    status: current
+    description: >-
+      Fetches feed documents, parses Atom/RSS/RDF/JSON formats, and sanitizes,
+      rewrites, and filters entries (internal/reader).
+  - id: integration-hub
+    kind: applicationComponent
+    name: Integration hub
+    status: current
+    description: >-
+      Fan-out dispatcher (internal/integration) that delivers entries to the
+      third-party services each user has enabled.
+  - id: storage
+    kind: applicationComponent
+    name: Storage layer
+    status: current
+    description: >-
+      Data-access layer (internal/storage) that owns every SQL query and is
+      shared by all HTTP surfaces and background components.
+
+  # --- Technology dependency ---
+  - id: postgresql
+    kind: systemSoftware
+    name: PostgreSQL
+    status: current
+    description: >-
+      The only supported database; provides persistence and full-text search.
+      Schema migrations live in internal/database.
+
+  # --- Principal information ---
+  - id: feed
+    kind: dataObject
+    name: Feed subscription
+    status: current
+    description: >-
+      A user's subscription to a source feed, including polling state, error
+      counters, and scraper/rewrite rules (internal/model/feed.go).
+  - id: entry
+    kind: dataObject
+    name: Entry
+    status: current
+    description: >-
+      A single article/item fetched from a feed, with read/starred state,
+      content, and enclosures (internal/model/entry.go).
+  - id: user-account
+    kind: dataObject
+    name: User account
+    status: current
+    description: >-
+      A Miniflux user with preferences, sessions, API keys, and integration
+      settings (internal/model/user.go).
+
+relationships:
+  # --- Composition: the single binary contains all runtime parts ---
+  - id: server-composes-web-ui
+    kind: composition
+    from: miniflux-server
+    to: web-ui
+  - id: server-composes-rest-api
+    kind: composition
+    from: miniflux-server
+    to: rest-api
+  - id: server-composes-fever-api
+    kind: composition
+    from: miniflux-server
+    to: fever-api
+  - id: server-composes-greader-api
+    kind: composition
+    from: miniflux-server
+    to: greader-api
+  - id: server-composes-media-proxy
+    kind: composition
+    from: miniflux-server
+    to: media-proxy
+  - id: server-composes-scheduler
+    kind: composition
+    from: miniflux-server
+    to: feed-scheduler
+  - id: server-composes-worker-pool
+    kind: composition
+    from: miniflux-server
+    to: worker-pool
+  - id: server-composes-feed-pipeline
+    kind: composition
+    from: miniflux-server
+    to: feed-pipeline
+  - id: server-composes-integration-hub
+    kind: composition
+    from: miniflux-server
+    to: integration-hub
+  - id: server-composes-storage
+    kind: composition
+    from: miniflux-server
+    to: storage
+
+  # --- Serving: who consumes which surface ---
+  - id: webui-serves-reader
+    kind: serving
+    from: web-ui
+    to: reader
+    description: The reader browses, reads, stars, and saves entries in the web interface.
+  - id: mediaproxy-serves-reader
+    kind: serving
+    from: media-proxy
+    to: reader
+    description: External images and media are delivered through the proxy to protect reader privacy.
+  - id: restapi-serves-clients
+    kind: serving
+    from: rest-api
+    to: client-app
+    description: Third-party clients manage feeds and entries over the JSON API under /v1/.
+  - id: fever-serves-clients
+    kind: serving
+    from: fever-api
+    to: client-app
+    description: Legacy clients speak the Fever protocol under /fever/.
+  - id: greader-serves-clients
+    kind: serving
+    from: greader-api
+    to: client-app
+    description: Clients speak the Google Reader protocol under /reader/api/0/.
+  - id: reader-uses-clients
+    kind: association
+    from: reader
+    to: client-app
+    description: Readers may use third-party mobile or desktop clients instead of the web UI.
+  - id: oidc-serves-webui
+    kind: serving
+    from: oidc-provider
+    to: web-ui
+    description: Optional OAuth2/OIDC login for the web session (internal/oauth2, internal/ui/oauth2_*.go).
+
+  # --- Shared storage layer ---
+  - id: storage-serves-webui
+    kind: serving
+    from: storage
+    to: web-ui
+  - id: storage-serves-restapi
+    kind: serving
+    from: storage
+    to: rest-api
+  - id: storage-serves-fever
+    kind: serving
+    from: storage
+    to: fever-api
+  - id: storage-serves-greader
+    kind: serving
+    from: storage
+    to: greader-api
+  - id: pg-serves-storage
+    kind: serving
+    from: postgresql
+    to: storage
+    description: PostgreSQL provides persistence and full-text search; the storage layer issues all SQL.
+  - id: storage-manages-feeds
+    kind: access
+    from: storage
+    to: feed
+    mode: read-write
+  - id: storage-manages-entries
+    kind: access
+    from: storage
+    to: entry
+    mode: read-write
+  - id: storage-manages-users
+    kind: access
+    from: storage
+    to: user-account
+    mode: read-write
+
+  # --- Background feed refresh flow ---
+  - id: scheduler-selects-due-feeds
+    kind: access
+    from: feed-scheduler
+    to: feed
+    mode: read
+    description: The batch builder selects enabled feeds whose next-check time has expired, bounded per host.
+  - id: scheduler-dispatches-jobs
+    kind: flow
+    from: feed-scheduler
+    to: worker-pool
+    content: Batches of feed refresh jobs
+    description: Every polling tick, due-feed jobs are pushed onto the shared worker pool.
+  - id: pool-runs-refresh
+    kind: flow
+    from: worker-pool
+    to: feed-pipeline
+    content: Feed refresh jobs
+    description: Each worker goroutine executes RefreshFeed for one job.
+  - id: publisher-supplies-feeds
+    kind: flow
+    from: feed-publisher
+    to: feed-pipeline
+    content: Atom, RSS, RDF, and JSON Feed documents
+    description: The pipeline fetches the feed URL over HTTP with conditional requests (ETag/Last-Modified).
+  - id: pipeline-stores-entries
+    kind: flow
+    from: feed-pipeline
+    to: storage
+    content: Sanitized, rewritten, and filtered entries
+    description: New and updated entries are persisted through RefreshFeedEntries.
+  - id: pipeline-notifies-integrations
+    kind: flow
+    from: feed-pipeline
+    to: integration-hub
+    content: New entries from a refresh
+    description: After a refresh stores new entries, they are pushed asynchronously to the user's enabled integrations.
+  - id: hub-delivers-entries
+    kind: flow
+    from: integration-hub
+    to: integration-target
+    content: New and saved entries
+    description: Entries are delivered to each enabled third-party service.
+
+  # --- On-demand refresh from the HTTP surfaces ---
+  - id: webui-enqueues-refresh
+    kind: flow
+    from: web-ui
+    to: worker-pool
+    content: Manual refresh jobs
+    description: Manual feed/category refresh from the UI pushes jobs onto the same pool.
+  - id: restapi-enqueues-refresh
+    kind: flow
+    from: rest-api
+    to: worker-pool
+    content: API-initiated refresh jobs
+    description: API-initiated feed/category refresh pushes jobs onto the same pool.
+
+  # --- Save-entry flow ---
+  - id: reader-saves-entry
+    kind: flow
+    from: reader
+    to: web-ui
+    content: Save-entry action
+    description: The reader clicks Save on an entry.
+  - id: webui-sends-saved-entry
+    kind: flow
+    from: web-ui
+    to: integration-hub
+    content: Saved entry
+    description: Saving an entry invokes SendEntry for the user's enabled third-party providers.

@@ -1,0 +1,16 @@
+format: yarramate/projection/v1
+id: save-entry-flow
+version: "1.0"
+query:
+  subjects:
+    - miniflux#reader
+    - miniflux#web-ui
+    - miniflux#integration-hub
+    - miniflux#integration-target
+  relationships: between
+presentation:
+  title: Save entry to third-party services
+  description: >-
+    Ordered flow: the reader saves an entry in the web UI, which invokes
+    SendEntry on the integration hub, and the entry is delivered to each
+    third-party service the user enabled.
