@@ -2,11 +2,11 @@ format: yarramate/likec4-project/v1
 id: uptime-kuma
 version: "1.0"
 title: Uptime Kuma architecture
-mapping: .yarramate/integrations/likec4/subject-mapping.yaml
+mapping: integrations/likec4/subject-mapping.yaml
 views:
-  - projection: .yarramate/projections/system-overview.yaml
+  - projection: projections/system-overview.yaml
   - id: monitor-check-flow
-    projection: .yarramate/projections/monitor-check-flow.yaml
+    projection: projections/monitor-check-flow.yaml
     dynamic:
       steps:
         - relationship: uptime-kuma#core-starts-monitors
@@ -16,7 +16,7 @@ views:
         - relationship: uptime-kuma#hub-delivers-alerts
         - relationship: uptime-kuma#core-streams-events
   - id: push-heartbeat-flow
-    projection: .yarramate/projections/push-heartbeat-flow.yaml
+    projection: projections/push-heartbeat-flow.yaml
     dynamic:
       steps:
         - relationship: uptime-kuma#agent-pushes-heartbeat

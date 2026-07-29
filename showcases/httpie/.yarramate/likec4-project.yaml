@@ -2,11 +2,11 @@ format: yarramate/likec4-project/v1
 id: httpie
 version: "1.0"
 title: HTTPie CLI architecture
-mapping: .yarramate/integrations/likec4/subject-mapping.yaml
+mapping: integrations/likec4/subject-mapping.yaml
 views:
-  - projection: .yarramate/projections/httpie-orientation.yaml
+  - projection: projections/httpie-orientation.yaml
   - id: request-flow
-    projection: .yarramate/projections/request-flow.yaml
+    projection: projections/request-flow.yaml
     dynamic:
       steps:
         - relationship: httpie#user-invokes-cli
@@ -17,7 +17,7 @@ views:
         - relationship: httpie#builder-streams-messages
         - relationship: httpie#output-renders-to-user
   - id: download-flow
-    projection: .yarramate/projections/download-flow.yaml
+    projection: projections/download-flow.yaml
     dynamic:
       steps:
         - relationship: httpie#user-invokes-cli
