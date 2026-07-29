@@ -1,0 +1,28 @@
+{
+  "format": "yarramate/likec4-generated-project/v2",
+  "project": "fastify@1.0",
+  "mapping": "fastify-likec4@1.0",
+  "views": [
+    {
+      "projection": "framework-overview@1.0"
+    },
+    {
+      "id": "request-lifecycle",
+      "projection": "request-lifecycle@1.0"
+    },
+    {
+      "id": "plugin-registration",
+      "projection": "plugin-registration@1.0"
+    }
+  ],
+  "files": [
+    "likec4.config.json",
+    "model.likec4",
+    "specification.likec4"
+  ],
+  "digests": {
+    "likec4.config.json": "aa04193e9e355fc0cbd58503e6189880a3b5e3e9501e98aa79abe386ff2e034e",
+    "model.likec4": "d638f98b854e82722a826cea7c019fb035b4303e9f1f18a4f541799d621e887e",
+    "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  }
+}
