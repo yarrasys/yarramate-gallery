@@ -1,0 +1,28 @@
+{
+  "format": "yarramate/likec4-generated-project/v2",
+  "project": "uptime-kuma@1.0",
+  "mapping": "uptime-kuma-likec4@1.0",
+  "views": [
+    {
+      "projection": "system-overview@1.0"
+    },
+    {
+      "id": "monitor-check-flow",
+      "projection": "monitor-check-flow@1.0"
+    },
+    {
+      "id": "push-heartbeat-flow",
+      "projection": "push-heartbeat-flow@1.0"
+    }
+  ],
+  "files": [
+    "likec4.config.json",
+    "model.likec4",
+    "specification.likec4"
+  ],
+  "digests": {
+    "likec4.config.json": "bcc0e248828608f9543f9c140330626d5d67fb037f8bab259411d861bffcb480",
+    "model.likec4": "3d5799bb3e633389f19a6cd5299e7c61fab46dcad516ca127e600970af7296a5",
+    "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  }
+}
