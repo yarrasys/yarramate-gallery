@@ -143,12 +143,18 @@ observations:
     result: confirmed
     evidence:
       uri: repo:internal/ui/feed_refresh.go
-      message: go h.pool.Push(jobs); also category_refresh.go.
+      message: >-
+        go h.pool.Push(jobs) at feed_refresh.go:61 (refresh-all) and
+        category_refresh.go:58; single-feed refreshFeed at feed_refresh.go:21
+        calls feedHandler.RefreshFeed synchronously instead.
   - claim: miniflux#restapi-enqueues-refresh
     result: confirmed
     evidence:
       uri: repo:internal/api/feed_handlers.go
-      message: go h.pool.Push(jobs); also category_handlers.go.
+      message: >-
+        go h.pool.Push(jobs) at feed_handlers.go:97 (refresh-all) and
+        category_handlers.go:191; single-feed refresh at feed_handlers.go:66
+        calls feedHandler.RefreshFeed synchronously instead.
   - claim: miniflux#pg-serves-storage
     result: confirmed
     evidence:

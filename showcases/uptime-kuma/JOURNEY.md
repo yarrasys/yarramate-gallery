@@ -9,6 +9,7 @@
 | Branch | `master` (shallow clone) |
 | Analyzed | 2026-07-29 |
 | Toolchain | yarramate 0.4.0 (pinned; `yarramate` + `yarramate-likec4` stable CLIs) |
+| Re-verified | yarramate 0.6.0 on 2026-07-30 (check, reconcile, likec4 check; model unchanged) |
 | App version | uptime-kuma 2.4.0 (package.json) |
 
 ## Journey and question
@@ -154,11 +155,12 @@ Portability verification of this gallery copy:
 | CWD = showcase root | `yarramate-likec4 check <showcase>/.yarramate/integrations/likec4/project.yaml --json <workspace>` | ok |
 | CWD = clone root (re-verified) | both checks | ok |
 
-⚠️ The LikeC4 project document's `mapping:` and `views[].projection:` paths
-resolve against the **current working directory** (verified in
-`dist/adapters/likec4-cli.js`: `resolve(cwd, path)`), so `yarramate-likec4`
-commands must be run from the repository/showcase root. Core workspace paths
-are manifest-relative and CWD-independent.
+ℹ️ Under the 0.4.0 toolchain used for discovery, the LikeC4 project
+document's `mapping:` and `views[].projection:` paths resolved against the
+**current working directory**, so `yarramate-likec4` commands had to run
+from the showcase root. Since 0.5.0 they resolve relative to the project
+document and are CWD-independent, as core workspace paths always were
+(re-verified under 0.6.0 on 2026-07-30 from an unrelated directory).
 
 ## Unresolved architectural decisions
 

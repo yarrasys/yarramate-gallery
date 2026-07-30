@@ -28,7 +28,17 @@
   ],
   "digests": {
     "likec4.config.json": "cfc4da2c373e69d1982e92844d079361edc7e660f462e8a5d95805bcfc7d6ac3",
-    "model.likec4": "515482d6ed776e4ad214f3f456260c4a9a7cff10db65937b6114cad3a26ba0fe",
+    "model.likec4": "4f5d0464a0418782896f1d01d831d5a8a5c3e090ad53a98be1e77e3d32bd8ca5",
     "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  },
+  "inputDigests": {
+    ".yarramate/architecture/miniflux.yaml": "7daefcf8fd0a168a621aed01c50a0d52ae73ef35c4b19ab261a343b4de027833",
+    ".yarramate/likec4-project.yaml": "4c2bf5866206429c376e76040589f6121543f5fd10f1c3c0df8cb355ed32d841",
+    "integrations/likec4/subject-mapping.yaml": "b42f19f3d1d0122456d0a5704373873ad39691dddb51604f393f6618b9e6e490",
+    "projections/feed-refresh-flow.yaml": "388eec181e58e1d2b08b752b93cd9c91a9b4b90b32bd3800431ab05a2c9137d0",
+    "projections/http-surfaces.yaml": "ba174df776f6ea436fffa2fda22cd8fd3708faa06887171764bba416a9309738",
+    "projections/persistence.yaml": "9ce1e71e263b1859a501e93e4276f99b9baaa8e5665108d0c457b1deba03ac3c",
+    "projections/save-entry-flow.yaml": "b6243b103631ce623ed37471f2411d56ed6601b3b7a76adfaab1e31ff69709b7",
+    "projections/system-overview.yaml": "e938e20fc34fbfddaa045c2ce7d4c2d38a18060058cdbcec466d42feed93314a"
   }
 }

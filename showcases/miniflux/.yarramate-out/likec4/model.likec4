@@ -252,7 +252,7 @@ model {
     }
   }
   restApi -[flow]-> workerPool {
-    description 'API-initiated feed/category refresh pushes jobs onto the same pool.'
+    description 'API-initiated refresh-all and category refresh push jobs onto the same pool; single-feed refresh instead calls reader/handler.RefreshFeed synchronously and never reaches the pool.'
     metadata {
       yarramateId 'miniflux#restapi-enqueues-refresh'
       yarramateKind 'yarramate/core@0.1#flow'
@@ -388,7 +388,7 @@ model {
     }
   }
   webUi -[flow]-> workerPool {
-    description 'Manual feed/category refresh from the UI pushes jobs onto the same pool.'
+    description 'Refresh-all and category refresh from the UI push jobs onto the same pool; single-feed refresh instead calls reader/handler.RefreshFeed synchronously and never reaches the pool.'
     metadata {
       yarramateId 'miniflux#webui-enqueues-refresh'
       yarramateKind 'yarramate/core@0.1#flow'

@@ -30,7 +30,10 @@ npx -p yarramate yarramate check showcases/<repo>/.yarramate/workspace.yaml --js
 | [httpie](showcases/httpie/JOURNEY.md) | CLI tool / Python | 15 concepts, 22 relationships, 3 projections | 3 (2 dynamic) | 25/26 confirmed, 1 not-observed |
 
 All four models were discovered on 2026-07-29 with `yarramate@0.4.0`; source
-commit SHAs are in each `JOURNEY.md`.
+commit SHAs are in each `JOURNEY.md`. They were re-verified against
+`yarramate@0.6.0` on 2026-07-30 — `check`, `reconcile`, and `yarramate-likec4
+check` all pass, and every model re-exports byte-identical LikeC4 output, so
+no model changed as a result of the upgrade.
 
 ### uptime-kuma
 

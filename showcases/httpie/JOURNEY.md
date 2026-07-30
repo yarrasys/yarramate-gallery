@@ -9,6 +9,7 @@
 | Branch | `master` (shallow clone) |
 | Analyzed | 2026-07-29 |
 | Toolchain | yarramate 0.4.0 (`yarramate`, `yarramate-likec4`) |
+| Re-verified | yarramate 0.6.0 on 2026-07-30 (check, reconcile, likec4 check; model unchanged) |
 
 ## Journey and question
 
@@ -141,11 +142,12 @@ Portability from this gallery copy:
 | `yarramate check <showcase>/.yarramate/workspace.yaml --json` (any CWD) | ✅ workspace paths are manifest-relative |
 | `cd <showcase> && yarramate-likec4 check .yarramate/integrations/likec4/project.yaml --json .yarramate/workspace.yaml` | ✅ |
 
-⚠️ LikeC4 project references (`mapping`, `views[].projection`) resolve
-against the **current working directory**, and the schema forbids `..`
-segments and absolute paths. The likec4 check must therefore be run from the
-repository/showcase root. The core `yarramate check` has no such
-restriction.
+ℹ️ Under the 0.4.0 toolchain used for discovery, LikeC4 project references
+(`mapping`, `views[].projection`) resolved against the **current working
+directory**, so the likec4 check had to run from the showcase root. Since
+0.5.0 those references resolve relative to the project document, and the
+check passes from any working directory (re-verified under 0.6.0 on
+2026-07-30). The core `yarramate check` never had the restriction.
 
 ## Unresolved architectural decisions
 

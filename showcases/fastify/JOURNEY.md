@@ -9,6 +9,7 @@
 | Branch | `main` (shallow clone; fastify v5.10.0 per package.json) |
 | Analyzed | 2026-07-29 |
 | Toolchain | yarramate 0.4.0 (`yarramate`, `yarramate-likec4`) |
+| Re-verified | yarramate 0.6.0 on 2026-07-30 (check, reconcile, likec4 check; model unchanged) |
 
 ## Journey and question
 
