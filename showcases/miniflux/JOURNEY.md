@@ -9,6 +9,7 @@
 | Branch | `main` (shallow clone) |
 | Analyzed | 2026-07-29 |
 | Toolchain | yarramate 0.4.0 (`yarramate`, `yarramate-likec4`) |
+| Re-verified | yarramate 0.6.0 on 2026-07-30 (check, reconcile, likec4 check; model unchanged) |
 | Profile | `yarramate/core@0.1` |
 
 ## Journey and question
@@ -39,9 +40,11 @@ commit above?
   sanitizes (`internal/reader/processor`), persists via
   `store.RefreshFeedEntries`, and asynchronously pushes new entries to
   enabled integrations (`go integration.PushEntries`).
-- Manual refresh from the UI (`internal/ui/feed_refresh.go`,
+- Refresh-all and category refresh, from the UI (`internal/ui/feed_refresh.go`,
   `category_refresh.go`) and the REST API (`internal/api/feed_handlers.go`,
-  `category_handlers.go`) enqueues jobs onto the same pool.
+  `category_handlers.go`), enqueue jobs onto the same pool. Single-feed
+  refresh is the exception: it calls `reader/handler.RefreshFeed`
+  synchronously and never reaches the pool.
 - Save-entry: `internal/ui/entry_save.go` and
   `internal/api/entry_handlers.go` invoke `integration.SendEntry`.
 - Storage: all SQL lives in `internal/storage`; PostgreSQL only
@@ -140,9 +143,11 @@ components (~30 collapsed into one concept), and deployment packaging
 
 ## Validation
 
-All commands used the pinned yarramate 0.4.0 toolchain. Adapter checks run
-from the directory containing `.yarramate/` because LikeC4 project `mapping`
-and `projection` paths resolve against the process working directory.
+All commands used the pinned yarramate 0.4.0 toolchain, and were re-run
+under 0.6.0 on 2026-07-30 with the same results. Under 0.4.0 the adapter
+checks had to run from the directory containing `.yarramate/`; since 0.5.0
+LikeC4 project references resolve relative to the project document, so the
+checks pass from any working directory (re-verified from an unrelated one).
 
 | Command | Outcome |
 | --- | --- |

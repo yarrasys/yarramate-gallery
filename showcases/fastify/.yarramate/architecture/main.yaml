@@ -407,7 +407,7 @@ relationships:
     kind: triggering
     from: fn-request-hooks
     to: fn-parsing
-    description: After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:74).
+    description: After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:73 and :87).
   - id: parsing-triggers-validation
     kind: triggering
     from: fn-parsing

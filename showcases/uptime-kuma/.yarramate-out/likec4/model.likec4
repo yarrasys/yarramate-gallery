@@ -36,7 +36,7 @@ model {
     }
   }
   monitorEngine = applicationComponent 'Monitor engine' {
-    description 'Per-monitor check loop (server/model/monitor.js) with pluggable check types under server/monitor-types/ (HTTP, TCP, DNS, ping, MQTT, SNMP, gRPC, databases, and more); computes uptime and drives alerting.'
+    description 'Per-monitor check loop (server/model/monitor.js) computing uptime and driving alerting. Check types resolve two ways: http, keyword, json-query, and ping are legacy branches inline in the loop, while newer types (TCP, DNS, MQTT, SNMP, gRPC, databases, and more) dispatch through UptimeKumaServer.monitorTypeList to server/monitor-types/.'
     metadata {
       yarramateId 'uptime-kuma#monitor-engine'
       yarramateKind 'yarramate/core@0.1#applicationComponent'

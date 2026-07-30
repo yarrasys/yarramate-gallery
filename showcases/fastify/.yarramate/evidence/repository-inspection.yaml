@@ -45,7 +45,9 @@ observations:
     result: confirmed
     evidence:
       uri: repo:lib/content-type-parser.js
-      message: Per-content-type parser registry run from lib/handle-request.js:74.
+      message: >-
+        Per-content-type parser registry run from lib/handle-request.js:73
+        (empty content type) and :87 (declared content type).
   - subject: fastify#schema-engine
     result: confirmed
     evidence:
@@ -264,7 +266,9 @@ observations:
     result: confirmed
     evidence:
       uri: repo:lib/route.js
-      message: preParsingHookRunner then handleRequest at lines 654-657; parser run in lib/handle-request.js:74.
+      message: >-
+        preParsingHookRunner then handleRequest at lines 654-657; parser run
+        in lib/handle-request.js:73 and :87.
   - claim: fastify#parsing-triggers-validation
     result: confirmed
     evidence:

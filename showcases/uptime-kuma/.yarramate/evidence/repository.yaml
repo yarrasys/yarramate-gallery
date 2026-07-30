@@ -19,7 +19,10 @@ observations:
     result: confirmed
     evidence:
       uri: repo:server/model/monitor.js
-      message: Check loop; 26 pluggable check types under server/monitor-types/.
+      message: >-
+        Check loop; http, keyword, json-query, and ping branch inline
+        (monitor.js:473, 681, 728), while 25 concrete modules under
+        server/monitor-types/ dispatch via monitorTypeList (monitor.js:869).
   - subject: uptime-kuma#notification-hub
     result: confirmed
     evidence:

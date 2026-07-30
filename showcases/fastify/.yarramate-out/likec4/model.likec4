@@ -421,7 +421,7 @@ model {
     }
   }
   fnRequestHooks -[triggering]-> fnParsing {
-    description 'After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:74).'
+    description 'After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:73 and :87).'
     metadata {
       yarramateId 'fastify#request-hooks-trigger-parsing'
       yarramateKind 'yarramate/core@0.1#triggering'
@@ -520,7 +520,7 @@ views {
       description 'After route match, the onRequest hook chain starts (lib/route.js:560-566).'
     }
     fnRequestHooks -> fnParsing {
-      description 'After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:74).'
+      description 'After preParsing, the content-type parser consumes the body (lib/route.js:654-657, lib/handle-request.js:73 and :87).'
     }
     fnParsing -> fnValidation {
       description 'The parsed body enters preValidation and compiled schema validation (lib/handle-request.js validateSchema).'

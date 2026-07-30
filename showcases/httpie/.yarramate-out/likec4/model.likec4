@@ -15,7 +15,7 @@ model {
     }
   }
   downloadManager = applicationComponent 'Download mode' {
-    description 'httpie/downloads.py. wget-like mode activated by --download; resolves target filenames, supports resume via Content-Range, tracks progress, and writes the response body to disk instead of the output pipeline.'
+    description 'httpie/downloads.py. wget-like mode activated by --download; resolves target filenames, supports resume via Content-Range, and tracks progress. The body still flows through the stream machinery — core.py calls write_stream with the downloader\'s stream — so what --download bypasses is formatting and printing, not the output pipeline itself.'
     metadata {
       yarramateId 'httpie#download-manager'
       yarramateKind 'yarramate/core@0.1#applicationComponent'

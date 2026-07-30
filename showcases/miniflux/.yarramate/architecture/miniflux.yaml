@@ -319,13 +319,19 @@ relationships:
     from: web-ui
     to: worker-pool
     content: Manual refresh jobs
-    description: Manual feed/category refresh from the UI pushes jobs onto the same pool.
+    description: >-
+      Refresh-all and category refresh from the UI push jobs onto the same
+      pool; single-feed refresh instead calls reader/handler.RefreshFeed
+      synchronously and never reaches the pool.
   - id: restapi-enqueues-refresh
     kind: flow
     from: rest-api
     to: worker-pool
     content: API-initiated refresh jobs
-    description: API-initiated feed/category refresh pushes jobs onto the same pool.
+    description: >-
+      API-initiated refresh-all and category refresh push jobs onto the same
+      pool; single-feed refresh instead calls reader/handler.RefreshFeed
+      synchronously and never reaches the pool.
 
   # --- Save-entry flow ---
   - id: reader-saves-entry

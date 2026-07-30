@@ -22,7 +22,15 @@
   ],
   "digests": {
     "likec4.config.json": "bcc0e248828608f9543f9c140330626d5d67fb037f8bab259411d861bffcb480",
-    "model.likec4": "3d5799bb3e633389f19a6cd5299e7c61fab46dcad516ca127e600970af7296a5",
+    "model.likec4": "273bfdd7c3450bc342ba67501b7c8494bc8e60624487e21ae752b8c3f71b4ef8",
     "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  },
+  "inputDigests": {
+    ".yarramate/architecture/main.yaml": "6661aa5bf4bae3b0bd81088b17fbed112179a66c9e05bd4632b04fab1e0f8d6e",
+    ".yarramate/likec4-project.yaml": "5a682a18876019882a5953f59ec50089c87990af407d9d8733f85ff5ba48c03c",
+    "integrations/likec4/subject-mapping.yaml": "e79e00b36fc9d6e1806a2171f8b164780cb16102b47e04d8b320cc447f6193e4",
+    "projections/monitor-check-flow.yaml": "525da1af44077f30579faaf3dfb034dba13f10b4773440e469847cfd3769a498",
+    "projections/push-heartbeat-flow.yaml": "ea06db8f0826faa8d5a8ddb87829832a2e0f8ddea3b6d74bde929a8afb79c538",
+    "projections/system-overview.yaml": "c0883866aac12ad57c151bdcd7c5c6883bd5435fde1997de221501d87f255dd2"
   }
 }

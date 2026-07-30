@@ -22,7 +22,15 @@
   ],
   "digests": {
     "likec4.config.json": "9a8dae368a78328505931631175c66d3fca24eec8e958dc632cc1301bd91daaa",
-    "model.likec4": "529c846e6ed2bbb7f5b1e3f82048cad81f92c1473688ad20525599594c0bbba3",
+    "model.likec4": "6b4d237ddb8ed09a5bc409cb83cb46b48a6432d509706245f3e0833b277d051b",
     "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  },
+  "inputDigests": {
+    ".yarramate/architecture/main.yaml": "ca2ec948d40d72d17d3e12b67342ca5588e2bd6db157e9889bd2ad9b2fb3800d",
+    ".yarramate/likec4-project.yaml": "98b32a6c9c0a175a04f8f1f0b51ff82b2ff7a8fc9e50c865bcc749e2b4a36d79",
+    "integrations/likec4/subject-mapping.yaml": "72b66437b8a7da72abb564e99bce35019297dc5351256aee7ef0fb38e3d5e677",
+    "projections/download-flow.yaml": "e31ea1889b61c1a8957a7c49588bdcb7bba22b8a61c593dd732f3339bfccdfc4",
+    "projections/httpie-orientation.yaml": "adcf487e1b9cc990b2f3fb2e053e40eec3160da12ba06e12515981ea6fa29889",
+    "projections/request-flow.yaml": "b136db1574a067c5f26c4705e77682222fcecc413feac6389de16ac5f01f23b0"
   }
 }
