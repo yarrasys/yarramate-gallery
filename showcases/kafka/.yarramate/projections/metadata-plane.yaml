@@ -1,0 +1,21 @@
+format: yarramate/projection/v1
+id: metadata-plane
+version: "1.0"
+query:
+  subjects:
+    - kafka#kafka-cluster
+    - kafka#controller
+    - kafka#controller-quorum
+    - kafka#raft-consensus
+    - kafka#metadata-log
+    - kafka#metadata-publisher
+    - kafka#cluster-metadata-cache
+    - kafka#broker
+    - kafka#topic-partition
+  relationships: between
+presentation:
+  title: KRaft metadata plane
+  description: >-
+    The control plane: the controller quorum runs Raft consensus over the single
+    __cluster_metadata log; committed records become a metadata image published to
+    every node's in-memory cache.

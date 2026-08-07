@@ -1,0 +1,21 @@
+format: yarramate/projection/v1
+id: consumer-group-coordination
+version: "1.0"
+query:
+  subjects:
+    - kafka#consumer-application
+    - kafka#consumer-client
+    - kafka#group-coordinator
+    - kafka#consumer-group
+    - kafka#partition-assignor
+    - kafka#topic-partition
+    - kafka#broker
+    - kafka#consumer-offsets
+  relationships: between
+presentation:
+  title: Consumer-group coordination
+  description: >-
+    Ordered flow: the consumer joins its group at the coordinator, the
+    cooperative-sticky assignor computes the partition assignment, the
+    coordinator delivers it, the consumer polls records from leaders, and
+    commits offsets to the __consumer_offsets topic.

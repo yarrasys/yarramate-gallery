@@ -1,0 +1,42 @@
+format: yarramate/projection/v1
+id: system-overview
+version: "1.0"
+query:
+  subjects:
+    - keycloak#end-user
+    - keycloak#client-application
+    - keycloak#administrator
+    - keycloak#external-idp
+    - keycloak#ldap-directory
+    - keycloak#relational-database
+    - keycloak#keycloak-server
+    - keycloak#admin-rest-api
+    - keycloak#account-service
+    - keycloak#authentication-flow-engine
+    - keycloak#token-service
+    - keycloak#identity-broker
+    - keycloak#user-federation
+    - keycloak#authorization-service
+    - keycloak#policy-enforcer
+    - keycloak#protocol-mapper
+    - keycloak#spi-provider-model
+    - keycloak#oidc-protocol-endpoint
+    - keycloak#saml-protocol-endpoint
+    - keycloak#jpa-store
+    - keycloak#infinispan-cache
+    - keycloak#realm
+    - keycloak#client
+    - keycloak#client-scope
+    - keycloak#user
+    - keycloak#role
+    - keycloak#group
+    - keycloak#user-session
+    - keycloak#credential
+    - keycloak#authorization-resource
+  relationships: between
+presentation:
+  title: Keycloak system overview
+  description: >-
+    Repository orientation: the Keycloak Quarkus server, its internal services,
+    the protocol and admin surfaces, the actors and external systems around it,
+    and its principal information, as observed at tag 26.7.1.

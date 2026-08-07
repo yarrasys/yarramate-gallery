@@ -1,0 +1,18 @@
+format: yarramate/projection/v1
+id: authorization-services
+version: "1.0"
+query:
+  subjects:
+    - keycloak#client-application
+    - keycloak#policy-enforcer
+    - keycloak#authorization-service
+    - keycloak#token-service
+    - keycloak#jpa-store
+    - keycloak#authorization-resource
+  relationships: between
+presentation:
+  title: Authorization services and policy enforcement
+  description: >-
+    Fine-grained authorization: resources, scopes, and policies persisted through
+    the JPA store and evaluated by the authorization services, enforced at the
+    client side by the policy enforcer.

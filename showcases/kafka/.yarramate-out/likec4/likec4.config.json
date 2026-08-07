@@ -1,0 +1,5 @@
+{
+  "$schema": "https://likec4.dev/schemas/config.json",
+  "name": "yarramate-kafka-1-0",
+  "title": "Apache Kafka architecture (4.3.1, KRaft)"
+}
