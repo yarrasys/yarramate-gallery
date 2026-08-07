@@ -1,0 +1,20 @@
+format: yarramate/projection/v1
+id: brokered-login-flow
+version: "1.0"
+query:
+  subjects:
+    - keycloak#client-application
+    - keycloak#oidc-protocol-endpoint
+    - keycloak#identity-broker
+    - keycloak#external-idp
+    - keycloak#jpa-store
+    - keycloak#token-service
+    - keycloak#user
+  relationships: between
+presentation:
+  title: Brokered login flow
+  description: >-
+    Ordered flow: the OIDC endpoint routes login through the identity broker, the
+    broker redirects to and is called back by an external identity provider, the
+    returned identity is mapped onto a realm user, and tokens are minted and
+    returned to the client.

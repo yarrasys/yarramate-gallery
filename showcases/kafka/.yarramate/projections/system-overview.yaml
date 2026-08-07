@@ -1,0 +1,38 @@
+format: yarramate/projection/v1
+id: system-overview
+version: "1.0"
+query:
+  subjects:
+    - kafka#producer-application
+    - kafka#consumer-application
+    - kafka#producer-client
+    - kafka#consumer-client
+    - kafka#partition-assignor
+    - kafka#kafka-cluster
+    - kafka#broker
+    - kafka#controller
+    - kafka#controller-quorum
+    - kafka#raft-consensus
+    - kafka#replica-manager
+    - kafka#log-manager
+    - kafka#group-coordinator
+    - kafka#replica-fetcher
+    - kafka#metadata-publisher
+    - kafka#topic
+    - kafka#topic-partition
+    - kafka#in-sync-replica-set
+    - kafka#high-watermark
+    - kafka#record
+    - kafka#partition-log
+    - kafka#log-segment
+    - kafka#metadata-log
+    - kafka#cluster-metadata-cache
+    - kafka#consumer-group
+    - kafka#consumer-offsets
+  relationships: between
+presentation:
+  title: Kafka system overview
+  description: >-
+    Repository orientation: the Kafka cluster (KRaft), its broker and controller
+    nodes, the client libraries, the topic/partition/replication model, on-disk
+    log storage, the metadata log, and consumer-group state — all 26 concepts.

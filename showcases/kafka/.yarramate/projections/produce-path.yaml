@@ -1,0 +1,21 @@
+format: yarramate/projection/v1
+id: produce-path
+version: "1.0"
+query:
+  subjects:
+    - kafka#producer-client
+    - kafka#broker
+    - kafka#partition-log
+    - kafka#log-segment
+    - kafka#replica-fetcher
+    - kafka#replica-manager
+    - kafka#in-sync-replica-set
+    - kafka#high-watermark
+  relationships: between
+presentation:
+  title: Produce path
+  description: >-
+    Ordered flow: the producer sends a Produce request to the partition leader
+    broker, which appends records to the active log segment, replicates to
+    follower replicas within the ISR, advances the high watermark, and
+    acknowledges the producer (acks=all).

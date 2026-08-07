@@ -1,0 +1,44 @@
+{
+  "format": "yarramate/likec4-generated-project/v2",
+  "project": "kafka@1.0",
+  "mapping": "kafka-likec4@1.0",
+  "views": [
+    {
+      "projection": "system-overview@1.0"
+    },
+    {
+      "projection": "replication-and-storage@1.0"
+    },
+    {
+      "projection": "metadata-plane@1.0"
+    },
+    {
+      "id": "produce-path",
+      "projection": "produce-path@1.0"
+    },
+    {
+      "id": "consumer-group-coordination",
+      "projection": "consumer-group-coordination@1.0"
+    }
+  ],
+  "files": [
+    "likec4.config.json",
+    "model.likec4",
+    "specification.likec4"
+  ],
+  "digests": {
+    "likec4.config.json": "62fce73b2285141c5c511e1f90e1a985baf23470ac1046611b14166176876171",
+    "model.likec4": "cf6ff98fc4129ea800f414c8ebda7db3c5394fd086bf3fb58a92198bb5de88c2",
+    "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
+  },
+  "inputDigests": {
+    ".yarramate/architecture/kafka.yaml": "df8a5976fc8270835e62d2b662ca2978e69e56f6081853f8ed3e2a17b8997d37",
+    ".yarramate/likec4-project.yaml": "19fe44c24eb762d5b66fe6513cb6b349a0c36c63c325d7187b5122b0e56bd2a5",
+    "integrations/likec4/subject-mapping.yaml": "72f187be55b30a95bedb3083403339cd92d2a108f2fab88cf62d7e7d486be301",
+    "projections/consumer-group-coordination.yaml": "543a78b1f9b54beff657ffa85de96c70996fce956b74f6b09c21fa62a43e970d",
+    "projections/metadata-plane.yaml": "98783d47402bd0d29ae258b38685fc84bb977df9b60b3ffd52eb1c3cade9fc7b",
+    "projections/produce-path.yaml": "b05931c6ae8f7e8add8aff9f8f6818115a4d5419ed34c63fdc4799c3b253eaf7",
+    "projections/replication-and-storage.yaml": "4099f5097fa7c4a4d0d82c9d45a67514a1e927607af16c5959911e787173daf6",
+    "projections/system-overview.yaml": "7e3ac919a24858b49dc82d92d6fb3f52d37970c711fb246436d8d39af9f5be54"
+  }
+}

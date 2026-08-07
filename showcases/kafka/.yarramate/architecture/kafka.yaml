@@ -1,0 +1,445 @@
+format: yarramate/v1
+id: kafka
+profile: yarramate/core@0.1
+concepts:
+  # --- Actors (interpretation supported by repository docs) ---
+  - id: producer-application
+    kind: businessActor
+    name: Producer application
+    status: current
+    description: >-
+      Application that publishes records to Kafka topics. The repository ships a
+      KafkaProducer client library for it; the actor itself is an interpretation.
+  - id: consumer-application
+    kind: businessActor
+    name: Consumer application
+    status: current
+    description: >-
+      Application that subscribes to topics and consumes records as a member of a
+      consumer group. The repository ships a KafkaConsumer client library for it;
+      the actor itself is an interpretation.
+
+  # --- Client libraries (observed) ---
+  - id: producer-client
+    kind: applicationComponent
+    name: Producer client
+    status: current
+    description: >-
+      KafkaProducer with its RecordAccumulator and background Sender thread
+      (clients/producer). It batches records per partition and sends Produce
+      requests to partition leaders; the acks setting controls durability.
+  - id: consumer-client
+    kind: applicationComponent
+    name: Consumer client
+    status: current
+    description: >-
+      KafkaConsumer, a facade over a ConsumerDelegate. The classic delegate uses a
+      ConsumerCoordinator to join groups and a Fetcher to pull records from
+      partition leaders (clients/consumer).
+  - id: partition-assignor
+    kind: applicationComponent
+    name: Partition assignor
+    status: current
+    description: >-
+      Client-side partition assignor run by the group-leader consumer to map
+      partitions to members. The cooperative-sticky assignor is the default
+      (CooperativeStickyAssignor), with eager sticky, range, and round-robin
+      alternatives in the same package.
+
+  # --- Cluster nodes and control plane (observed) ---
+  - id: kafka-cluster
+    kind: applicationComponent
+    name: Kafka cluster
+    status: current
+    description: >-
+      A set of Kafka nodes sharing a single replicated metadata log. KafkaRaftServer
+      constructs each node from its process.roles; SharedServer owns the shared Raft
+      manager and metadata loader.
+  - id: broker
+    kind: applicationComponent
+    name: Broker
+    status: current
+    description: >-
+      KRaft broker node (BrokerServer). It serves produce and fetch requests, hosts
+      partition replicas, and runs a group coordinator. A node may combine the broker
+      and controller roles in one process (process.roles=broker,controller).
+  - id: controller
+    kind: applicationComponent
+    name: Controller
+    status: current
+    description: >-
+      KRaft controller node (ControllerServer hosting a QuorumController). The Raft
+      leader of the metadata log is the single active controller that manages cluster
+      metadata; all other controllers stand by.
+  - id: controller-quorum
+    kind: applicationComponent
+    name: Controller quorum
+    status: current
+    description: >-
+      The configured controller voters that form the KRaft quorum. They elect the
+      active controller and replicate the metadata log among themselves.
+  - id: raft-consensus
+    kind: applicationComponent
+    name: Raft consensus engine
+    status: current
+    description: >-
+      KafkaRaftClient, the Raft implementation over the metadata log. Leader election
+      is pure Raft; log replication is follower-pull (raft module).
+  - id: replica-manager
+    kind: applicationComponent
+    name: Replica manager
+    status: current
+    description: >-
+      ReplicaManager on a broker. It manages the hosted partition replicas, appends
+      records, serves fetches, shrinks and expands the ISR, and advances the high
+      watermark (core/server/ReplicaManager.scala).
+  - id: log-manager
+    kind: applicationComponent
+    name: Log manager
+    status: current
+    description: >-
+      LogManager (kafka.log) responsible for creating, loading, and retaining the
+      on-disk partition logs across the configured log directories.
+  - id: group-coordinator
+    kind: applicationComponent
+    name: Group coordinator
+    status: current
+    description: >-
+      GroupCoordinatorService running on a broker. It manages consumer groups,
+      assignment, and committed offsets, persisting them to the __consumer_offsets
+      topic (group-coordinator module).
+  - id: replica-fetcher
+    kind: applicationComponent
+    name: Replica fetcher
+    status: current
+    description: >-
+      ReplicaFetcherThread/Manager on a follower broker. It fetches records from the
+      leader, appends them to the local replica, and advances the follower's high
+      watermark (core/server/ReplicaFetcherThread.scala).
+  - id: metadata-publisher
+    kind: applicationComponent
+    name: Metadata publisher
+    status: current
+    description: >-
+      MetadataLoader with its MetadataPublisher implementations (notably
+      BrokerMetadataPublisher). It turns committed metadata batches into a
+      MetadataImage and publishes it to each node's in-memory cache and runtime.
+
+  # --- Replication model (principal information) ---
+  - id: topic
+    kind: dataObject
+    name: Topic
+    status: current
+    description: >-
+      A Kafka topic: a logical, ordered stream of records partitioned for
+      parallelism and replication across brokers.
+  - id: topic-partition
+    kind: dataObject
+    name: Partition
+    status: current
+    description: >-
+      A partition: the unit of replication. It has one leader replica and zero or
+      more follower replicas; leader, replicas, and ISR are recorded as a
+      PartitionRegistration in the metadata log (core/cluster/Partition.scala).
+  - id: in-sync-replica-set
+    kind: dataObject
+    name: In-sync replica set
+    status: current
+    description: >-
+      The ISR: the leader plus the follower replicas caught up within the configured
+      lag bound. It gates acks=all durability and high-watermark advancement.
+  - id: high-watermark
+    kind: dataObject
+    name: High watermark
+    status: current
+    description: >-
+      The highest offset replicated to all ISR replicas. It is monotonic and bounds
+      the offsets visible to consumers (UnifiedLog.highWatermarkMetadata).
+  - id: record
+    kind: dataObject
+    name: Record
+    status: current
+    description: >-
+      A Kafka record (key, value, timestamp, headers) produced and consumed as
+      batches of MemoryRecords.
+
+  # --- On-disk storage (artifacts) ---
+  - id: partition-log
+    kind: artifact
+    name: Partition log
+    status: current
+    description: >-
+      UnifiedLog: the append-only, offset-indexed log for one partition replica on
+      disk. Appends as leader assign offsets; appends as follower replicate them
+      (storage/log/UnifiedLog.java).
+  - id: log-segment
+    kind: artifact
+    name: Log segment
+    status: current
+    description: >-
+      LogSegment: a rollable log file with an offset index and a time index. Segments
+      compose a partition log and are rolled by size or time (storage/log/LogSegment.java).
+  - id: metadata-log
+    kind: artifact
+    name: Metadata log
+    status: current
+    description: >-
+      __cluster_metadata partition 0: the single internal topic that stores all
+      cluster metadata (topics, partitions, broker registrations, configs) and is
+      replicated by Raft (common/internals/Topic.java; KafkaRaftLog).
+  - id: cluster-metadata-cache
+    kind: artifact
+    name: Cluster metadata cache
+    status: current
+    description: >-
+      KRaftMetadataCache: each node's in-memory MetadataImage of the committed
+      cluster metadata, swapped wholesale on every update (metadata/KRaftMetadataCache.java).
+
+  # --- Consumer group state ---
+  - id: consumer-group
+    kind: dataObject
+    name: Consumer group
+    status: current
+    description: >-
+      A consumer group: members collectively consume a set of topics, each partition
+      assigned to exactly one member, sharing committed offsets.
+  - id: consumer-offsets
+    kind: dataObject
+    name: Committed offsets
+    status: current
+    description: >-
+      __consumer_offsets: the compacted internal topic storing committed consumer
+      offsets and group metadata, written by the group coordinator
+      (common/internals/Topic.java; OffsetMetadataManager).
+
+relationships:
+  # --- Composition: cluster structure ---
+  - id: cluster-composes-controller-quorum
+    kind: composition
+    from: kafka-cluster
+    to: controller-quorum
+  - id: cluster-composes-broker
+    kind: composition
+    from: kafka-cluster
+    to: broker
+  - id: cluster-composes-metadata-log
+    kind: composition
+    from: kafka-cluster
+    to: metadata-log
+  - id: broker-composes-replica-manager
+    kind: composition
+    from: broker
+    to: replica-manager
+  - id: broker-composes-log-manager
+    kind: composition
+    from: broker
+    to: log-manager
+  - id: broker-composes-group-coordinator
+    kind: composition
+    from: broker
+    to: group-coordinator
+  - id: broker-composes-metadata-cache
+    kind: composition
+    from: broker
+    to: cluster-metadata-cache
+  - id: broker-composes-replica-fetcher
+    kind: composition
+    from: broker
+    to: replica-fetcher
+    description: A broker hosts replica fetcher threads for partitions where it acts as a follower.
+  - id: log-manager-composes-partition-log
+    kind: composition
+    from: log-manager
+    to: partition-log
+  - id: partition-log-composes-segment
+    kind: composition
+    from: partition-log
+    to: log-segment
+  - id: topic-composes-partition
+    kind: composition
+    from: topic
+    to: topic-partition
+  - id: controller-composes-raft
+    kind: composition
+    from: controller
+    to: raft-consensus
+  - id: controller-composes-metadata-cache
+    kind: composition
+    from: controller
+    to: cluster-metadata-cache
+  - id: producer-app-composes-producer-client
+    kind: composition
+    from: producer-application
+    to: producer-client
+  - id: consumer-app-composes-consumer-client
+    kind: composition
+    from: consumer-application
+    to: consumer-client
+  - id: consumer-app-composes-assignor
+    kind: composition
+    from: consumer-application
+    to: partition-assignor
+
+  # --- Aggregation ---
+  - id: quorum-aggregates-controller
+    kind: aggregation
+    from: controller-quorum
+    to: controller
+    description: The controller quorum is the set of controller voters that elect the active controller.
+  - id: group-aggregates-consumer
+    kind: aggregation
+    from: consumer-group
+    to: consumer-client
+    description: A consumer group aggregates its consumer members.
+
+  # --- Access: passive structures managed by active components ---
+  - id: raft-replicates-metadata-log
+    kind: access
+    from: raft-consensus
+    to: metadata-log
+    mode: read-write
+    description: The Raft engine appends to and replicates the metadata log.
+  - id: controller-writes-metadata-log
+    kind: access
+    from: controller
+    to: metadata-log
+    mode: read-write
+    description: The active controller appends metadata records (the Raft leader writes first).
+  - id: broker-manages-partition
+    kind: access
+    from: broker
+    to: topic-partition
+    mode: read-write
+    description: A broker hosts replicas of partitions, acting as leader or follower.
+  - id: replica-manager-manages-replicas
+    kind: access
+    from: replica-manager
+    to: topic-partition
+    mode: read-write
+    description: ReplicaManager holds the hosted partitions and drives append, fetch, and leader/follower transitions.
+  - id: replica-manager-manages-isr
+    kind: access
+    from: replica-manager
+    to: in-sync-replica-set
+    mode: read-write
+    description: ReplicaManager periodically shrinks the ISR and expands it as followers catch up.
+  - id: replica-manager-manages-hw
+    kind: access
+    from: replica-manager
+    to: high-watermark
+    mode: read-write
+    description: ReplicaManager advances the high watermark to the minimum log-end offset across the ISR.
+  - id: coordinator-manages-group
+    kind: access
+    from: group-coordinator
+    to: consumer-group
+    mode: read-write
+    description: The group coordinator owns consumer-group membership and assignment state.
+  - id: coordinator-manages-offsets
+    kind: access
+    from: group-coordinator
+    to: consumer-offsets
+    mode: read-write
+    description: The group coordinator commits and reads offsets in the __consumer_offsets topic.
+  - id: broker-reads-metadata-cache
+    kind: access
+    from: broker
+    to: cluster-metadata-cache
+    mode: read
+    description: The broker reads leader and ISR placement from its metadata cache to route requests.
+  - id: controller-manages-partitions
+    kind: access
+    from: controller
+    to: topic-partition
+    mode: read-write
+    description: The controller sets partition leader, replicas, and ISR via PartitionRegistration records in the metadata log.
+  - id: assignor-reads-partitions
+    kind: access
+    from: partition-assignor
+    to: topic-partition
+    mode: read
+    description: The assignor reads the subscribed partitions to distribute them across group members.
+
+  # --- Produce path flow ---
+  - id: producer-sends-records
+    kind: flow
+    from: producer-client
+    to: broker
+    content: Produce request (batched producer records)
+    description: The Sender builds a ProduceRequest with the configured acks and sends ready batches to the partition leader.
+  - id: broker-appends-log
+    kind: flow
+    from: broker
+    to: partition-log
+    content: Records appended as leader
+    description: handleProduceRequest routes to ReplicaManager, which appends to the leader's UnifiedLog via appendAsLeader.
+  - id: log-appends-segment
+    kind: flow
+    from: partition-log
+    to: log-segment
+    content: Records appended to the active segment
+    description: UnifiedLog.append writes to the active LogSegment, assigning offsets and updating the offset/time indexes.
+  - id: broker-replicates-followers
+    kind: flow
+    from: broker
+    to: replica-fetcher
+    content: Replicated records (leader to follower replicas within the ISR)
+    description: The leader broker serves fetch requests from follower brokers' replica fetcher threads.
+  - id: broker-acks-producer
+    kind: flow
+    from: broker
+    to: producer-client
+    content: Produce acknowledgement
+    description: With acks=all the leader waits until the record is replicated to the whole ISR before acknowledging the producer.
+
+  # --- Consumer-group coordination flow ---
+  - id: consumer-joins-group
+    kind: flow
+    from: consumer-client
+    to: group-coordinator
+    content: Join group and heartbeat
+    description: The consumer's coordinator joins (or rejoins) the group and heartbeats to stay alive.
+  - id: assignor-computes-assignment
+    kind: flow
+    from: partition-assignor
+    to: consumer-group
+    content: Partition assignment
+    description: The group-leader consumer runs the assignor to map partitions to members.
+  - id: coordinator-delivers-assignment
+    kind: flow
+    from: group-coordinator
+    to: consumer-client
+    content: Partition assignment
+    description: The coordinator delivers each member's assignment through the sync/heartbeat response.
+  - id: consumer-fetches-records
+    kind: flow
+    from: consumer-client
+    to: broker
+    content: Fetch request (poll)
+    description: The consumer's Fetcher issues Fetch requests to partition leaders and returns the collected records.
+  - id: consumer-commits-offsets
+    kind: flow
+    from: consumer-client
+    to: group-coordinator
+    content: Offset commit
+    description: The consumer commits offsets (sync or async) to its group coordinator.
+
+  # --- Metadata pipeline and ISR negotiation flow ---
+  - id: metadata-log-to-publisher
+    kind: flow
+    from: metadata-log
+    to: metadata-publisher
+    content: Committed metadata batches
+    description: The Raft client feeds committed batches to the MetadataLoader (a Raft listener).
+  - id: publisher-updates-cache
+    kind: flow
+    from: metadata-publisher
+    to: cluster-metadata-cache
+    content: New metadata image
+    description: BrokerMetadataPublisher calls metadataCache.setImage with each new MetadataImage.
+  - id: replica-manager-alterpartition
+    kind: flow
+    from: replica-manager
+    to: controller
+    content: AlterPartition ISR change requests
+    description: The broker sends ISR changes to the controller, which commits the new ISR to the metadata log.

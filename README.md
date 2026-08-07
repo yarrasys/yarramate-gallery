@@ -22,18 +22,24 @@ npx -p yarramate yarramate check showcases/<repo>/.yarramate/workspace.yaml --js
 
 ## Showcases
 
+Ordered from a single-process CLI tool to enterprise application software and
+distributed infrastructure:
+
 | Showcase | Shape / language | Model | Views | Reconciliation |
 |---|---|---|---|---|
-| [uptime-kuma](showcases/uptime-kuma/JOURNEY.md) | Self-hosted app / Node+Vue | 16 concepts, 20 relationships, 3 projections | 3 (2 dynamic) | 28/29 confirmed, 1 unknown |
-| [miniflux](showcases/miniflux/JOURNEY.md) | Server daemon / Go | 20 concepts, 36 relationships, 5 projections | 5 (2 dynamic) | 36/37 confirmed, 1 unknown |
-| [fastify](showcases/fastify/JOURNEY.md) | Framework library / Node | 34 concepts, 46 relationships, 3 projections | 3 (2 dynamic) | 59/60 confirmed, 1 not-observed |
 | [httpie](showcases/httpie/JOURNEY.md) | CLI tool / Python | 15 concepts, 22 relationships, 3 projections | 3 (2 dynamic) | 25/26 confirmed, 1 not-observed |
+| [fastify](showcases/fastify/JOURNEY.md) | Framework library / Node | 34 concepts, 46 relationships, 3 projections | 3 (2 dynamic) | 59/60 confirmed, 1 not-observed |
+| [miniflux](showcases/miniflux/JOURNEY.md) | Server daemon / Go | 20 concepts, 36 relationships, 5 projections | 5 (2 dynamic) | 36/37 confirmed, 1 unknown |
+| [uptime-kuma](showcases/uptime-kuma/JOURNEY.md) | Self-hosted app / Node+Vue | 16 concepts, 20 relationships, 3 projections | 3 (2 dynamic) | 28/29 confirmed, 1 unknown |
+| [keycloak](showcases/keycloak/JOURNEY.md) | Enterprise IAM server / Java (Quarkus) | 30 concepts, 53 relationships, 5 projections | 5 (2 dynamic) | 54/55 confirmed, 1 unknown |
+| [kafka](showcases/kafka/JOURNEY.md) | Distributed streaming platform / Java+Scala | 26 concepts, 42 relationships, 5 projections | 5 (2 dynamic) | 68/68 confirmed, 0 findings |
 
-All four models were discovered on 2026-07-29 with `yarramate@0.4.0`; source
-commit SHAs are in each `JOURNEY.md`. They were re-verified against
-`yarramate@0.6.0` on 2026-07-30 — `check`, `reconcile`, and `yarramate-likec4
-check` all pass, and every model re-exports byte-identical LikeC4 output, so
-no model changed as a result of the upgrade.
+The first four models were discovered on 2026-07-29 with `yarramate@0.4.0` and
+re-verified against `yarramate@0.6.0` on 2026-07-30 (`check`, `reconcile`, and
+`yarramate-likec4 check` all pass; every model re-exports byte-identical LikeC4
+output, so no model changed on upgrade). The Keycloak and Kafka models were
+discovered on 2026-08-07 with `yarramate@0.15.0`. Source commit SHAs are in each
+`JOURNEY.md`.
 
 ### uptime-kuma
 
@@ -78,6 +84,33 @@ colourises (via Pygments) the messages for the terminal — or, under
 limited to a platform config directory holding `config.json` and per-host
 session files, and a plugin manager loads auth/formatter/transport extensions
 via package entry points.
+
+### keycloak
+
+Keycloak is an enterprise identity and access management server built on
+Java/Quarkus, exposing OpenID Connect, OAuth 2.0, and SAML 2.0 endpoints. Its
+central abstraction is the realm — an isolated tenant managing its own clients
+(applications), users, roles, and credentials — persisted through a JPA layer to
+a relational store (PostgreSQL, MariaDB, MSSQL, or Oracle). Two integration
+seams define its enterprise reach: identity brokering delegates authentication
+to external identity providers, while user federation links or syncs users from
+LDAP/Active Directory. The server is extensible through Service Provider
+Interfaces (custom authentication flows, storage and identity providers,
+protocol mappers), and authorization services expose a resource/scope/policy
+model enforced by a policy enforcer embedded in client applications.
+
+### kafka
+
+Apache Kafka is a distributed event streaming platform written in Java and
+Scala, run since 4.0 exclusively in KRaft mode (Apache ZooKeeper removed). A
+cluster is a set of brokers, some of which form a KRaft controller quorum that
+replicates cluster metadata through a Raft consensus log. Data lives in topics
+split into partitions — append-only, segment-backed logs — where each partition
+has one leader broker handling all reads and writes and zero or more followers
+replicating it; the in-sync replica set and a high watermark govern durability
+and visibility. Producers publish to partition leaders; consumers organised in
+consumer groups coordinate with a group coordinator (a broker) for partition
+assignment and offset commits.
 
 ## Why this exists
 

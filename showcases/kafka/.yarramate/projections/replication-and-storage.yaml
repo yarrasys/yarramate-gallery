@@ -1,0 +1,23 @@
+format: yarramate/projection/v1
+id: replication-and-storage
+version: "1.0"
+query:
+  subjects:
+    - kafka#broker
+    - kafka#replica-manager
+    - kafka#replica-fetcher
+    - kafka#log-manager
+    - kafka#partition-log
+    - kafka#log-segment
+    - kafka#topic
+    - kafka#topic-partition
+    - kafka#in-sync-replica-set
+    - kafka#high-watermark
+    - kafka#record
+  relationships: between
+presentation:
+  title: Replication and on-disk storage
+  description: >-
+    The data plane: how a broker hosts partition replicas, appends records to a
+    segment-based append-only log, replicates to followers within the ISR, and
+    advances the high watermark.
