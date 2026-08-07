@@ -155,6 +155,38 @@ assignment and offset commits.
 
 ▶ flows: [produce-path](showcases/kafka/diagrams/produce-path.png) · [consumer-group-coordination](showcases/kafka/diagrams/consumer-group-coordination.png) — all views in [`diagrams/`](showcases/kafka/diagrams/)
 
+## Ask the models
+
+A YarraMate model isn't a static picture — it answers questions, deterministically
+and offline, against the committed workspace. Two kinds of query:
+
+**"Where in the code is X?"** — `yarramate ask <workspace> --where "<X>"` returns
+each matching concept with the exact source location its evidence confirms:
+
+```
+yarramate ask showcases/keycloak/.yarramate/workspace.yaml --where "identity broker"
+  → keycloak#identity-broker
+      confirmed  repo:services/src/main/java/org/keycloak/services/resources/IdentityBrokerService.java
+        /realms/{realm}/broker endpoints for login, link, callback, and token retrieval.
+  → keycloak#external-idp
+      confirmed  repo:services/src/main/java/org/keycloak/social
+        One provider package per external IdP (google, github, gitlab, microsoft, …).
+```
+
+**"Explain X and what it connects to."** — `yarramate ask <workspace> "<X>"`
+returns a deterministic prose slice of the matching concepts and their
+relationships (try `"user federation LDAP"` on Keycloak, or
+`"consumer group offset commit"` on Kafka).
+
+Both run with no network and no source checkout beyond the showcase's own
+`.yarramate/`. Try any of them:
+
+```sh
+yarramate ask showcases/kafka/.yarramate/workspace.yaml --where "partition replication leader"
+yarramate ask showcases/httpie/.yarramate/workspace.yaml --where "output pipeline"
+yarramate ask showcases/<repo>/.yarramate/workspace.yaml "your own question"
+```
+
 ## Why this exists
 
 - **Reference models** — a checked, evidence-grounded current-state architecture
