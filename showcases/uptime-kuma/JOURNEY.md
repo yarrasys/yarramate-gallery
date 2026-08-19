@@ -10,6 +10,7 @@
 | Analyzed | 2026-07-29 |
 | Toolchain | yarramate 0.4.0 (pinned; `yarramate` + `yarramate-likec4` stable CLIs) |
 | Re-verified | yarramate 0.6.0 on 2026-07-30 (check, reconcile, likec4 check; model unchanged) |
+| Re-verified | yarramate 0.22.0 on 2026-08-19 (check, reconcile, likec4 check; byte-identical LikeC4 re-export; model unchanged) |
 | App version | uptime-kuma 2.4.0 (package.json) |
 
 ## Journey and question

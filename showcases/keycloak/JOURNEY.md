@@ -10,6 +10,7 @@
 | Clone | `git clone --depth 1 --branch 26.7.1` (shallow, detached HEAD); HEAD SHA verified equal to the commit above |
 | Analyzed | 2026-08-07 |
 | Toolchain | yarramate 0.15.0 (`yarramate`, `yarramate-likec4`) |
+| Re-verified | yarramate 0.22.0 on 2026-08-19 (check, reconcile, likec4 check; byte-identical LikeC4 re-export; model unchanged) |
 | Profile | `yarramate/core@0.1` |
 
 ## Journey and question

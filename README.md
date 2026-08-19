@@ -66,10 +66,12 @@ distributed infrastructure:
 | [kafka](showcases/kafka/JOURNEY.md) | Distributed streaming platform / Java+Scala | 26 concepts, 42 relationships, 5 projections | 5 (2 dynamic) | 68/68 confirmed, 0 findings |
 
 The first four models were discovered on 2026-07-29 with `yarramate@0.4.0` and
-re-verified against `yarramate@0.6.0` on 2026-07-30 (`check`, `reconcile`, and
-`yarramate-likec4 check` all pass; every model re-exports byte-identical LikeC4
-output, so no model changed on upgrade). The Keycloak and Kafka models were
-discovered on 2026-08-07 with `yarramate@0.15.0`. Source commit SHAs are in each
+the Keycloak and Kafka models on 2026-08-07 with `yarramate@0.15.0`. All six
+were re-verified against `yarramate@0.22.0` on 2026-08-19 (`check`, `reconcile`,
+and `yarramate-likec4 check` all pass with zero diagnostics; every model
+re-exports byte-identical LikeC4 output, so no model changed on upgrade — the
+0.4.0-era models have now crossed the 0.7.0 command-surface break and eighteen
+minor releases without a byte of drift). Source commit SHAs are in each
 `JOURNEY.md`.
 
 ### httpie

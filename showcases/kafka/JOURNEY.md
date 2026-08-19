@@ -11,6 +11,7 @@
 | Branch | `4.3.1` (shallow clone, detached HEAD) |
 | Analyzed | 2026-08-07 |
 | Toolchain | yarramate 0.15.0, yarramate-likec4 0.15.0 |
+| Re-verified | yarramate 0.22.0 on 2026-08-19 (check, reconcile, likec4 check; byte-identical LikeC4 re-export; model unchanged) |
 | Profile | `yarramate/core@0.1` |
 
 The freeze target `a07059eb9b5bac1bfdbb1e74313f2fae4ca20fd9` is the **annotated
