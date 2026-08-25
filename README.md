@@ -50,7 +50,7 @@ npx -p yarramate yarramate check showcases/<repo>/.yarramate/workspace.yaml --js
 | Showcase | Shape / language | Model | Views | Reconciliation |
 |---|---|---|---|---|
 | [kafka](showcases/kafka/JOURNEY.md) | Distributed streaming platform / Java+Scala | 26 concepts, 42 relationships, 5 projections | 5 (2 dynamic) | 68/68 confirmed, 0 findings |
-| [gitlab](showcases/gitlab/JOURNEY.md) | DevOps platform / Ruby+Go | 84 concepts, 162 relationships, 3 projections, 2 states | 3 (2 dynamic) | 48/49 confirmed, 1 not-observed |
+| [gitlab](showcases/gitlab/JOURNEY.md) | DevOps platform / Ruby+Go | 85 concepts, 168 relationships, 3 projections, 2 states | 3 (2 dynamic) | 53/53 confirmed, 0 findings |
 
 ### kafka
 
@@ -92,10 +92,15 @@ It is the showcase where the checking loop matters most, because GitLab
 publishes its own architecture page. That page is **declared intent**; the
 FOSS source at the pinned commit is **evidence**; `reconcile` is what puts
 them against each other. The one deliberate disagreement is recorded rather
-than smoothed over: Praefect is declared on GitLab's architecture page and
-absent from the FOSS tree, so it stands as the single `not-observed` claim in
-the table above. Two interview questions are left open by design, and
-`JOURNEY.md` says which and why.
+than smoothed over, and where the model itself was wrong that is recorded too.
+
+This showcase has been through an independent audit: a session that did not
+build the model, given only `AUDIT-PROMPT.md`, checked it against the same
+pinned commit. It found two critical errors in the two claims the showcase was
+positioned on, including one where the model asserted a component was absent
+from the tree that is demonstrably present. Both are corrected, and
+`JOURNEY.md` records what was wrong rather than quietly fixing it. Two
+interview questions remain open by design.
 
 Discovered on 2026-08-24 with `yarramate@1.0.0` against GitLab FOSS `v19.3.0`
 (commit `2c30df78`), catalogue `core-enrichment@1.0`. The clone carries no
