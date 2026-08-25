@@ -1,0 +1,249 @@
+format: yarramate/evidence/v1
+id: gitlab-repository
+version: "1.0"
+provider: repository-inspection
+observations:
+  - subject: gitlab-rails
+    result: confirmed
+    evidence:
+      uri: repo:config.ru
+      message: Rack entrypoint for the Rails monolith; app/ carries the full layer stack (models, controllers, services, workers, graphql, finders, policies).
+  - subject: sidekiq
+    result: confirmed
+    evidence:
+      uri: repo:config/sidekiq_queues.yml
+      message: Queue roster for the background processor; app/workers holds the job classes (post_receive.rb among them).
+  - subject: rest-api
+    result: confirmed
+    evidence:
+      uri: repo:lib/api
+      message: Grape REST surface; 159 endpoint files at v19.3.0.
+  - subject: graphql-api
+    result: confirmed
+    evidence:
+      uri: repo:app/graphql/gitlab_schema.rb
+      message: The GraphQL schema root; app/graphql carries types and resolvers.
+  - subject: web-ui
+    result: confirmed
+    evidence:
+      uri: repo:app/controllers
+      message: Browser-facing controllers and views; Vue assets under app/assets.
+  - subject: integrations-framework
+    result: confirmed
+    evidence:
+      uri: repo:app/models/integrations
+      message: 54 provider models at v19.3.0, 50 subclassing Integration; collapsed to one function per the sampling stance.
+  - subject: workhorse
+    result: confirmed
+    evidence:
+      uri: repo:workhorse/go.mod
+      message: In-tree Go module gitlab.com/gitlab-org/gitlab/workhorse; version pinned by GITLAB_WORKHORSE_VERSION = 19.3.0.
+  - subject: gitaly
+    result: confirmed
+    evidence:
+      uri: repo:GITALY_SERVER_VERSION
+      message: Satellite pin 19.3.0; the service's own source lives in its own repository.
+  - subject: gitlab-shell
+    result: confirmed
+    evidence:
+      uri: repo:GITLAB_SHELL_VERSION
+      message: Satellite pin 14.56.1.
+  - subject: gitlab-pages
+    result: confirmed
+    evidence:
+      uri: repo:GITLAB_PAGES_VERSION
+      message: Satellite pin 19.3.0.
+  - subject: container-registry
+    result: confirmed
+    evidence:
+      uri: repo:lib/container_registry
+      message: The monolith's client side of the registry protocol; the registry service itself ships separately.
+  - subject: kas
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/kas.rb
+      message: Client/config for the agent server; version pinned by GITLAB_KAS_VERSION = 19.3.0.
+  - subject: mailroom
+    result: confirmed
+    evidence:
+      uri: repo:config/mail_room.yml
+      message: Inbound-email configuration; cells-mailroom/ carries the cells-era receiver.
+  - subject: zoekt-search
+    result: confirmed
+    evidence:
+      uri: repo:GITLAB_ZOEKT_VERSION
+      message: Pinned 1.16.1; succeeding the ES indexer for code search per GitLab's public direction.
+  - subject: es-indexer
+    result: confirmed
+    evidence:
+      uri: repo:GITLAB_ELASTICSEARCH_INDEXER_VERSION
+      message: Pinned 5.14.7; the incumbent Zoekt supersedes.
+  - subject: praefect
+    result: not-observed
+    evidence:
+      uri: repo:GITALY_SERVER_VERSION
+      message: Declared on GitLab's architecture page beside Gitaly; no version pin, directory, or client for it exists in the FOSS tree at v19.3.0.
+  - subject: domain-events
+    result: confirmed
+    evidence:
+      uri: repo:app/events
+      message: 62 event classes published through Gitlab::EventStore.
+  - subject: feature-flag-evaluation
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_flags
+      message: 559 flag definition files at v19.3.0.
+  - subject: feature-flag-definitions
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_flags
+      message: The definitions themselves, one YAML per flag.
+  - subject: gitlab-runner
+    result: confirmed
+    evidence:
+      uri: repo:lib/api/ci/runner.rb
+      message: The runner-facing API the external runner product polls; the runner itself is a separate repository.
+  - subject: rest-api-serves-shell
+    result: confirmed
+    evidence:
+      uri: repo:lib/api/internal/base.rb
+      message: The internal API endpoints gitlab-shell calls to authorize SSH sessions.
+  - subject: rails-enqueues-sidekiq
+    result: confirmed
+    evidence:
+      uri: repo:app/workers/post_receive.rb
+      message: Representative worker on the push path; enqueued by the monolith, consumed by Sidekiq.
+  - subject: pipeline-processing
+    result: confirmed
+    evidence:
+      uri: repo:app/services/ci/create_pipeline_service.rb
+      message: Entry point of the pipeline domain; 97 service objects under app/services/ci at v19.3.0.
+  - subject: yaml-processor
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/ci/yaml_processor.rb
+      message: Compiles .gitlab-ci.yml into the pipeline plan.
+  - subject: runner-api
+    result: confirmed
+    evidence:
+      uri: repo:lib/api/ci/runner.rb
+      message: The runner protocol - job requests, trace appends, artifact uploads.
+  - subject: ci-pipeline-record
+    result: confirmed
+    evidence:
+      uri: repo:app/models/ci/pipeline.rb
+      message: Pipeline domain records; stage.rb and build.rb beside it among 81 CI models.
+  - subject: ci-config
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/ci/yaml_processor.rb
+      message: The processor's input; the file itself lives in each project's repository.
+  - subject: job-artifacts
+    result: confirmed
+    evidence:
+      uri: repo:app/models/ci/job_artifact.rb
+      message: Artifact records; build_trace.rb carries the log side.
+  - subject: merge-request-processing
+    result: confirmed
+    evidence:
+      uri: repo:app/services/merge_requests/merge_service.rb
+      message: 57 MR service objects at v19.3.0; create_service.rb and merge_service.rb are the busy ends.
+  - subject: merge-request-record
+    result: confirmed
+    evidence:
+      uri: repo:app/models/merge_request_diff.rb
+      message: MR and diff records with their commit/file satellites and approvals.
+  - subject: authentication
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/auth.rb
+      message: Central auth module; Devise sessions via sessions_controller.rb, OmniAuth under lib/gitlab/auth/o_auth.
+  - subject: user-accounts
+    result: confirmed
+    evidence:
+      uri: repo:app/models/user.rb
+      message: The user record and its credential/token satellites.
+  - subject: webhooks
+    result: confirmed
+    evidence:
+      uri: repo:app/models/hooks/web_hook_log.rb
+  - subject: gitlab-stage-verify
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: Feature-to-group taxonomy the stage-group owners are read from; one representative observation for the seven group actors.
+  - subject: git-storage-service
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/gitaly_client.rb
+      message: The monolith's Gitaly client; the service every repository read and write crosses.
+  - subject: git-ssh-service
+    result: confirmed
+    evidence:
+      uri: repo:GITLAB_SHELL_VERSION
+      message: Delivered by gitlab-shell 14.56.1; sessions authorize through lib/api/internal/base.rb.
+  - subject: http-gateway-service
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/workhorse.rb
+      message: The Rails side of the Workhorse handoff protocol; uploads and git-over-HTTP offload here.
+  - subject: static-site-service
+    result: confirmed
+    evidence:
+      uri: repo:app/models/pages_deployment.rb
+      message: Pages deployments are artifact archives the Pages daemon serves.
+  - subject: image-distribution-service
+    result: confirmed
+    evidence:
+      uri: repo:lib/container_registry
+      message: The registry protocol client and token flow.
+  - subject: cluster-connectivity-service
+    result: confirmed
+    evidence:
+      uri: repo:lib/gitlab/kas.rb
+      message: KAS address/config surface the monolith exposes to agents.
+  - subject: inbound-email-service
+    result: confirmed
+    evidence:
+      uri: repo:config/mail_room.yml
+      message: Mailroom delivery configuration into the queue the workers poll.
+  - subject: code-search-service
+    result: confirmed
+    evidence:
+      uri: repo:app/services/search
+      message: The search service layer the indexers feed.
+  - subject: async-execution-service
+    result: confirmed
+    evidence:
+      uri: repo:config/sidekiq_queues.yml
+      message: The queue roster behind every asynchronous promise the platform makes.
+  - subject: ci-execution-service
+    result: confirmed
+    evidence:
+      uri: repo:lib/api/ci/runner.rb
+      message: The runner protocol; execution happens on registered runners against it.
+  - subject: source-code-management
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: The source_code_management category and its Create-stage siblings ground the capability.
+  - subject: code-review
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: code_review_workflow category; realized by the MR domain.
+  - subject: continuous-integration
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: continuous_integration category; realized by the pipeline domain and runner protocol.
+  - subject: package-distribution
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: container_registry and package_registry categories.
+  - subject: code-search
+    result: confirmed
+    evidence:
+      uri: repo:config/feature_categories.yml
+      message: global_search category; Zoekt-backed at this version.

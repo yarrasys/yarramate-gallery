@@ -1,0 +1,10 @@
+format: yarramate/workspace/v1
+id: gitlab
+documents:
+  - architecture/*.yaml
+profiles: []
+projections:
+  - projections/*.yaml
+adapterMappings: []
+evidence:
+  - evidence/*.yaml

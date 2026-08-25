@@ -1,0 +1,2 @@
+# Visual session journals are per-machine state, never showcase content.
+.yarramate-out/visual/

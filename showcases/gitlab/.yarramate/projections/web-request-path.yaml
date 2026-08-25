@@ -1,0 +1,22 @@
+format: yarramate/projection/v1
+id: gitlab-web-request-path
+version: "1.0"
+query:
+  subjects:
+    - developer
+    - workhorse
+    - gitlab-rails
+    - web-ui
+    - graphql-api
+    - postgresql
+    - redis
+    - application-metadata
+    - job-queues
+  relationships: between
+presentation:
+  title: GitLab — a web request
+  description: >-
+    Browser to Workhorse to Puma: the front door, the monolith's web
+    behaviour, and the stores every page load leans on.
+  layout: layered
+  direction: left-right

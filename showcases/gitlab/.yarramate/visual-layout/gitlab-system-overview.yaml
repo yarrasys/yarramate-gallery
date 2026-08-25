@@ -1,0 +1,261 @@
+format: yarramate/visual-layout/v1
+projectionId: gitlab-system-overview
+positions:
+  agent-grpc-interface:
+    x: 6315.660317460318
+    y: 1198
+  application-metadata:
+    x: 5032.666666666667
+    y: 2612
+  async-execution-service:
+    x: 5590.771428571428
+    y: 1416
+  authentication:
+    x: 4376.573672303856
+    y: 2037.7525565605074
+  background-processing:
+    x: 5932.438095238095
+    y: 3498
+  cells-target:
+    x: 124
+    y: 86
+  ci-config:
+    x: 4191.9047619047615
+    y: 2404
+  ci-execution-service:
+    x: 3134.904761904762
+    y: 2673.5
+  ci-pipeline-record:
+    x: 3668.5714285714284
+    y: 3290
+  cluster-connectivity-service:
+    x: 6315.660317460318
+    y: 1416
+  code-review:
+    x: 1199
+    y: 2942
+  code-search:
+    x: 633
+    y: 1665
+  code-search-service:
+    x: 771.4285714285716
+    y: 1416
+  container-images:
+    x: 5359.104761904762
+    y: 3290
+  container-registry:
+    x: 5560.771428571428
+    y: 2206
+  continuous-integration:
+    x: 2439
+    y: 3290
+  customer-infrastructure:
+    x: 2782.904761904762
+    y: 2236
+  data-persistence:
+    x: 5788.660317460318
+    y: 918
+  develop-software:
+    x: 2687
+    y: 3498
+  developer:
+    x: 2742.707414983084
+    y: 3201.636514164764
+  development-teams:
+    x: 2935
+    y: 3290
+  domain-events:
+    x: 2191
+    y: 3290
+  email-ingestion:
+    x: 6750.993650793651
+    y: 1665
+  es-indexer:
+    x: 124
+    y: 1200.6666666666665
+  feature-flag-definitions:
+    x: 4802.571428571428
+    y: 2404
+  feature-flag-evaluation:
+    x: 4802.571428571428
+    y: 2195
+  foss-mit-license:
+    x: 5336.840692640693
+    y: 1416
+  git-io-through-gitaly:
+    x: 279.33333333333303
+    y: 918
+  git-repositories:
+    x: 758
+    y: 3290
+  git-ssh-service:
+    x: 2737.8558707975485
+    y: 3042.3489768050563
+  git-storage-service:
+    x: 2069.247619047619
+    y: 1416
+  gitaly:
+    x: 424.33333333333303
+    y: 1198
+  gitaly-rpc-interface:
+    x: 424.33333333333303
+    y: 1198
+  gitlab-core-platform:
+    x: 908
+    y: 86
+  gitlab-gitaly-team:
+    x: 1156
+    y: 86
+  gitlab-global-search:
+    x: 1404
+    y: 86
+  gitlab-instance:
+    x: 6623.422222222222
+    y: 402
+  gitlab-pages:
+    x: 3215.904761904762
+    y: 1676
+  gitlab-rails:
+    x: 5452.295238095238
+    y: 1678.6666666666667
+  gitlab-runner:
+    x: 3351.5714285714284
+    y: 2404
+  gitlab-shell:
+    x: 2626.5714285714284
+    y: 2664
+  gitlab-stage-create:
+    x: 1652
+    y: 86
+  gitlab-stage-deploy:
+    x: 1900
+    y: 86
+  gitlab-stage-package:
+    x: 2148
+    y: 86
+  gitlab-stage-verify:
+    x: 660
+    y: 86
+  graphql-api:
+    x: 5050.571428571428
+    y: 2195
+  http-endpoint:
+    x: 3060.904761904762
+    y: 2206
+  http-gateway-service:
+    x: 1053
+    y: 2673.5
+  image-distribution-service:
+    x: 5312.104761904762
+    y: 2942
+  inbound-email-service:
+    x: 6594.660317460318
+    y: 1416
+  index-maintenance:
+    x: 508
+    y: 1416
+  integrations-framework:
+    x: 5437.104761904762
+    y: 2404
+  job-artifacts:
+    x: 1943
+    y: 2942
+  job-execution:
+    x: 3382.904761904762
+    y: 2612
+  job-queues:
+    x: 6088.771428571428
+    y: 2154
+  kas:
+    x: 6315.660317460318
+    y: 1198
+  mailroom:
+    x: 6703.993650793651
+    y: 750
+  maintain-gitlab:
+    x: 1404
+    y: 254
+  merge-request-processing:
+    x: 2140.866666666667
+    y: 2666.6666666666665
+  merge-request-record:
+    x: 1447
+    y: 2942
+  oci-api-interface:
+    x: 5560.771428571428
+    y: 2206
+  package-distribution:
+    x: 5111.104761904762
+    y: 3290
+  pages-http-interface:
+    x: 3215.904761904762
+    y: 1676
+  pipeline-processing:
+    x: 3506.904761904762
+    y: 2942
+  postgresql:
+    x: 5970.860317460318
+    y: 750
+  praefect:
+    x: 2069.247619047619
+    y: 918
+  queue-brokering:
+    x: 3340.904761904762
+    y: 918
+  redis:
+    x: 3464.904761904762
+    y: 750
+  rest-api:
+    x: 3943.904761904762
+    y: 2404
+  run-gitlab-services:
+    x: 5722.860317460318
+    y: 750
+  run-runners:
+    x: 2751.5714285714284
+    y: 2404
+  runner-api:
+    x: 3652.904761904762
+    y: 2203.2
+  shorter-cycle-time:
+    x: 1757.666666666667
+    y: 3290
+  sidekiq:
+    x: 6036.660317460318
+    y: 918
+  single-devsecops-platform:
+    x: 1757.666666666667
+    y: 3498
+  single-instance:
+    x: 392
+    y: 86
+  source-code-management:
+    x: 1006
+    y: 3290
+  ssh-endpoint:
+    x: 2626.5714285714284
+    y: 2664
+  static-site-service:
+    x: 1892.8666666666668
+    y: 2666.6666666666665
+  toolchain-sprawl:
+    x: 1695
+    y: 2942
+  user-accounts:
+    x: 4532.571428571428
+    y: 2404
+  web-ui:
+    x: 5155.771428571428
+    y: 2404
+  webhooks:
+    x: 5839.771428571428
+    y: 2181.333333333333
+  workhorse:
+    x: 3060.904761904762
+    y: 2206
+  yaml-processor:
+    x: 4284.571428571428
+    y: 2208.666666666667
+  zoekt-search:
+    x: 2936.904761904762
+    y: 1187

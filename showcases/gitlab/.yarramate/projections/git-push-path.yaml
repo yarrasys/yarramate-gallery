@@ -1,0 +1,21 @@
+format: yarramate/projection/v1
+id: gitlab-git-push-path
+version: "1.0"
+query:
+  subjects:
+    - developer
+    - gitlab-shell
+    - rest-api
+    - gitlab-rails
+    - gitaly
+    - git-repositories
+    - sidekiq
+    - job-queues
+  relationships: between
+presentation:
+  title: GitLab — the push path
+  description: >-
+    git push over SSH: the shell authorizes against the internal API,
+    Gitaly lands the objects, and post-receive fans out through Sidekiq.
+  layout: layered
+  direction: left-right
