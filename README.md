@@ -38,6 +38,9 @@ showcases/<repo>/
   JOURNEY.md        # discovery report: provenance, observations, evidence, coverage gaps
 ```
 
+The model is the artefact; the rendering is optional. `kafka` carries the
+LikeC4 export and rendered previews, `gitlab` ships as a checked model alone.
+
 Every model passes the deterministic checks from its showcase directory:
 
 ```sh
@@ -47,6 +50,7 @@ npx -p yarramate yarramate check showcases/<repo>/.yarramate/workspace.yaml --js
 | Showcase | Shape / language | Model | Views | Reconciliation |
 |---|---|---|---|---|
 | [kafka](showcases/kafka/JOURNEY.md) | Distributed streaming platform / Java+Scala | 26 concepts, 42 relationships, 5 projections | 5 (2 dynamic) | 68/68 confirmed, 0 findings |
+| [gitlab](showcases/gitlab/JOURNEY.md) | DevOps platform / Ruby+Go | 84 concepts, 162 relationships, 3 projections, 2 states | 3 (2 dynamic) | 48/49 confirmed, 1 not-observed |
 
 ### kafka
 
@@ -73,6 +77,34 @@ made the rule for every relationship. No fact about Kafka changed in that
 migration; the shapes carrying those facts did. `JOURNEY.md` records what moved.
 
 ▶ flows: [produce-path](showcases/kafka/diagrams/produce-path.png) · [consumer-group-coordination](showcases/kafka/diagrams/consumer-group-coordination.png). All views in [`diagrams/`](showcases/kafka/diagrams/)
+
+### gitlab
+
+GitLab is a DevOps platform whose single Rails monolith is fronted and
+surrounded by purpose-built satellites: Workhorse in front of Puma to absorb
+long-running uploads and Git HTTP traffic, Gitaly owning every repository
+access as the only process that touches the disk, Sidekiq draining the
+background queue, Shell serving SSH pushes, and Pages, Registry and KAS
+serving their own protocols. The model carries both the topology and two
+ordered flows through it, the Git push path and the web request path.
+
+It is the showcase where the checking loop matters most, because GitLab
+publishes its own architecture page. That page is **declared intent**; the
+FOSS source at the pinned commit is **evidence**; `reconcile` is what puts
+them against each other. The one deliberate disagreement is recorded rather
+than smoothed over: Praefect is declared on GitLab's architecture page and
+absent from the FOSS tree, so it stands as the single `not-observed` claim in
+the table above. Two interview questions are left open by design, and
+`JOURNEY.md` says which and why.
+
+Discovered on 2026-08-24 with `yarramate@1.0.0` against GitLab FOSS `v19.3.0`
+(commit `2c30df78`), catalogue `core-enrichment@1.0`. The clone carries no
+`ee/` directory, so every claim is checkable against MIT-licensed source.
+
+This model ships without a LikeC4 export or rendered diagrams, deliberately.
+`AUDIT-PROMPT.md` beside it is the standing brief for an independent session
+to audit the model against GitLab's documentation and code, and score how
+faithfully the loop captured a system this size.
 
 ## Ask the models
 

@@ -1,0 +1,18 @@
+format: yarramate/projection/v1
+id: gitlab-system-overview
+version: "1.0"
+query:
+  kinds:
+    - yarramate/core@0.1#applicationComponent
+    - yarramate/core@0.1#systemSoftware
+    - yarramate/core@0.1#node
+  relationships: between
+presentation:
+  title: GitLab — system overview
+  description: >-
+    The component topology: the Rails monolith, every satellite the
+    version pins name, the stores, and the hosts. Behaviour, services,
+    information, strategy, and motivation live in the focused views and
+    the rail.
+  layout: layered
+  direction: top-down

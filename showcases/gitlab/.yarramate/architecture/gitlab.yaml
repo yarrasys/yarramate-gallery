@@ -1,0 +1,1188 @@
+format: yarramate/v1
+id: gitlab
+profile: yarramate/core@0.1
+states:
+  - id: single-instance
+    kind: baseline
+    name: Single-instance GitLab
+    description: >-
+      The architecture this model captures at v19.3.0: one logical
+      instance, however many nodes serve it.
+  - id: cells-target
+    kind: target
+    name: Cells
+    description: >-
+      GitLab's publicly documented target architecture: many cells behind
+      a routing layer. In-tree signals at v19.3.0: cells-mailroom/ and
+      the caproni tooling. Modelled as a declared direction, not a
+      detailed design; the cell router and topology are stated omissions.
+concepts:
+  # --- Actors -----------------------------------------------------------
+  - id: developer
+    kind: businessActor
+    name: Developer
+    description: >-
+      Pushes code over SSH or HTTPS, opens merge requests, browses the web
+      UI, and pulls container images. The one human actor modelled; site
+      visitors of Pages sites and operators are deliberate omissions.
+  - id: gitlab-runner
+    kind: applicationComponent
+    name: GitLab Runner
+    description: >-
+      CI job executor. A separate product in its own repository; modelled
+      here only as the consumer of the runner API the monolith serves.
+    owner: gitlab-stage-verify
+    status: current
+  # --- The Rails monolith and its processes -----------------------------
+  - id: gitlab-rails
+    kind: applicationComponent
+    name: GitLab Rails (Puma)
+    description: >-
+      The Ruby on Rails monolith served by Puma: controllers, models,
+      services, finders, policies, GraphQL and Grape REST APIs. One
+      component here; its API surfaces and subsystems are modelled as the
+      behaviour it performs.
+    owner: gitlab-core-platform
+    status: current
+  - id: sidekiq
+    kind: applicationComponent
+    name: Sidekiq
+    description: >-
+      Background job processor running the same Rails codebase
+      (app/workers), fed from Redis queues.
+    owner: gitlab-core-platform
+    status: current
+  - id: rest-api
+    kind: applicationService
+    name: REST API
+    description: >-
+      The Grape-based REST surface (lib/api, 159 endpoint files at
+      v19.3.0), consumed by runners, gitlab-shell, and external clients.
+    owner: gitlab-stage-create
+    status: current
+  - id: graphql-api
+    kind: applicationService
+    name: GraphQL API
+    description: The GraphQL surface (app/graphql), consumed by the web UI.
+    owner: gitlab-stage-create
+    status: current
+  - id: web-ui
+    kind: applicationService
+    name: Web UI
+    description: >-
+      The browser-facing application (controllers, views, Vue assets).
+    owner: gitlab-stage-create
+    status: current
+  - id: integrations-framework
+    kind: applicationFunction
+    name: Integrations framework
+    description: >-
+      The project-integration subsystem (app/models/integrations, 54
+      provider models at v19.3.0: Jira, Slack, and the rest, collapsed
+      into this one function per the sampling stance).
+  # --- Satellite services (each pinned by a *_VERSION file) --------------
+  - id: workhorse
+    aka:
+      - gitlab-workhorse
+    kind: applicationComponent
+    name: GitLab Workhorse
+    description: >-
+      Smart reverse proxy in Go, developed in-tree (workhorse/); handles
+      large uploads, git-over-HTTP, and proxies the rest to Puma.
+    owner: gitlab-stage-create
+    status: current
+  - id: gitaly
+    references:
+      - id: gitaly-cites-git-io-rule
+        ref: git-io-through-gitaly
+    kind: applicationComponent
+    name: Gitaly
+    description: >-
+      Git RPC service owning all repository access; pinned at 19.3.0 by
+      GITALY_SERVER_VERSION. Praefect clustering is a stated omission.
+    owner: gitlab-gitaly-team
+    status: current
+  - id: gitlab-shell
+    references:
+      - id: shell-cites-git-io-rule
+        ref: git-io-through-gitaly
+    kind: applicationComponent
+    name: GitLab Shell
+    description: >-
+      Handles git over SSH; pinned at 14.56.1. Authorizes each session
+      against the monolith's internal API, then talks to Gitaly.
+    owner: gitlab-stage-create
+    status: current
+  - id: gitlab-pages
+    kind: applicationComponent
+    name: GitLab Pages
+    description: Static-site server for repository pages, pinned at 19.3.0.
+    owner: gitlab-stage-deploy
+    status: current
+  - id: container-registry
+    kind: applicationComponent
+    name: Container registry
+    description: >-
+      OCI image registry; a separate service the monolith authenticates
+      via short-lived tokens (lib/container_registry is the client side).
+    owner: gitlab-stage-package
+    status: current
+  - id: kas
+    aka:
+      - gitlab-agent-server
+    kind: applicationComponent
+    name: GitLab Agent Server (KAS)
+    description: >-
+      Server side of the Kubernetes agent integration, pinned at 19.3.0.
+    owner: gitlab-stage-deploy
+    status: current
+  - id: mailroom
+    kind: applicationComponent
+    name: Mailroom
+    description: >-
+      Inbound email receiver (config/mail_room.yml, cells-mailroom/);
+      turns replies into jobs the background processor consumes.
+    owner: gitlab-core-platform
+    status: current
+  # --- Stores and infrastructure ----------------------------------------
+  - id: postgresql
+    kind: systemSoftware
+    name: PostgreSQL
+    description: The relational store behind the monolith and Sidekiq.
+  - id: redis
+    kind: systemSoftware
+    name: Redis
+    description: Queues, caching, and session state.
+  # --- Information ------------------------------------------------------
+  - id: git-repositories
+    kind: dataObject
+    name: Git repositories
+    description: >-
+      The repository data itself. Only Gitaly touches it; every other
+      component goes through Gitaly's RPC surface.
+    owner: gitlab-gitaly-team
+  - id: application-metadata
+    kind: dataObject
+    name: Application metadata
+    description: >-
+      Projects, users, merge requests, CI state: everything PostgreSQL
+      holds for the monolith.
+    owner: gitlab-core-platform
+  - id: job-queues
+    kind: dataObject
+    name: Job queues and cache
+    description: Sidekiq queues, caches, and sessions held in Redis.
+    owner: gitlab-core-platform
+  - id: pipeline-processing
+    kind: applicationFunction
+    name: Pipeline processing
+    description: "Creates and advances CI pipelines: 97 service objects under app/services/ci at v19.3.0, entered through CreatePipelineService. The behaviour behind GitLab's defining feature."
+  - id: yaml-processor
+    kind: applicationFunction
+    name: CI YAML processor
+    description: Compiles .gitlab-ci.yml into the pipeline plan (lib/gitlab/ci/yaml_processor.rb and lib/gitlab/ci generally).
+  - id: runner-api
+    kind: applicationService
+    name: Runner protocol API
+    description: The surface runners poll for jobs and stream traces and artifacts back through (lib/api/ci/runner.rb); more precise than the general REST surface it sits within.
+    owner: gitlab-stage-verify
+    status: current
+  - id: ci-pipeline-record
+    kind: dataObject
+    name: CI pipelines, stages, and jobs
+    description: "The pipeline domain records (app/models/ci: pipeline.rb, stage.rb, build.rb among 81 models)."
+    owner: gitlab-stage-verify
+  - id: ci-config
+    kind: dataObject
+    name: CI configuration
+    description: The project's .gitlab-ci.yml content, read out of the repository at pipeline creation.
+    owner: gitlab-stage-verify
+  - id: job-artifacts
+    kind: dataObject
+    name: Job artifacts and traces
+    description: Build outputs and logs (app/models/ci/job_artifact.rb, build_trace.rb), written through the runner protocol.
+    owner: gitlab-stage-verify
+  - id: merge-request-processing
+    kind: applicationFunction
+    name: Merge request processing
+    description: "Creating, updating, approving, and merging MRs: 57 service objects under app/services/merge_requests at v19.3.0."
+  - id: merge-request-record
+    kind: dataObject
+    name: Merge requests and diffs
+    description: "The MR domain records: merge_request.rb, merge_request_diff.rb and the diff/commit satellite models, approvals beside them."
+    owner: gitlab-stage-create
+  - id: authentication
+    kind: applicationFunction
+    name: Authentication
+    description: Session, token, and OAuth/OmniAuth authentication (lib/gitlab/auth.rb, Devise-based sessions, personal access tokens). Authorization policies (app/policies) are a stated omission at this grain.
+  - id: user-accounts
+    kind: dataObject
+    name: User accounts and credentials
+    description: app/models/user.rb and the token models around it.
+    owner: gitlab-core-platform
+  - id: webhooks
+    kind: applicationFunction
+    name: Webhooks
+    description: Project, system, and service hooks (app/models/hooks) delivered asynchronously by web_hook_worker.rb.
+  - id: toolchain-sprawl
+    kind: driver
+    name: Toolchain sprawl
+    description: "Teams stitch together separate tools to plan, build, test, secure, and deploy; the integration tax is the pressure GitLab's single-application positioning answers. Source: GitLab's public product messaging, not this repository."
+  - id: development-teams
+    kind: stakeholder
+    name: Development teams
+    description: The organizations adopting one platform for the software lifecycle; the Developer actor is their member in the flows.
+  - id: single-devsecops-platform
+    kind: goal
+    name: One application for the DevSecOps lifecycle
+    description: "GitLab's stated goal: plan, create, verify, package, secure, deploy, and monitor in a single application. Source: GitLab's public positioning; the FOSS edition realizes the create/verify core of it."
+  - id: shorter-cycle-time
+    kind: outcome
+    name: Shorter cycle time
+    description: "The measurable difference the goal exists for: less time from idea to running change because nothing leaves the platform. Source: GitLab's public messaging."
+  - id: git-io-through-gitaly
+    kind: constraint
+    name: All git I/O through Gitaly
+    description: "No component reads repository storage directly; every git operation crosses Gitaly's RPC surface. GitLab's own architecture documentation states the rule, and the tree shows it: the monolith, Workhorse, and Shell all carry Gitaly clients rather than filesystem access."
+  - id: foss-mit-license
+    kind: constraint
+    name: FOSS edition is MIT
+    description: The modelled edition (GitLab FOSS) is MIT-licensed (LICENSE at the repository root); EE functionality is out of this tree and out of this model.
+  - id: gitlab-stage-create
+    kind: businessActor
+    name: "Stage: Create"
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-stage-verify
+    kind: businessActor
+    name: "Stage: Verify"
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-stage-package
+    kind: businessActor
+    name: "Stage: Package"
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-stage-deploy
+    kind: businessActor
+    name: "Stage: Deploy"
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-gitaly-team
+    kind: businessActor
+    name: Gitaly team
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-core-platform
+    kind: businessActor
+    name: Core Platform
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: gitlab-global-search
+    kind: businessActor
+    name: Global Search group
+    description: GitLab product-hierarchy group, from their public handbook; grounded in-repo by config/feature_categories.yml. An interpretation at stage grain, stated for the audit to test.
+  - id: develop-software
+    kind: businessFunction
+    name: Develop software
+    description: "What the Developer actually does with all of this: writes, reviews, and ships changes through the platform."
+  - id: maintain-gitlab
+    kind: businessFunction
+    name: Maintain GitLab
+    description: The stewardship the stage groups perform over their components; one function at showcase grain rather than seven.
+  - id: gitlab-instance
+    kind: node
+    name: GitLab instance
+    description: A deployed installation (Omnibus package or the Helm chart), collapsed to one node at showcase grain; per-service topology, Praefect clustering, and Geo are stated omissions.
+  - id: container-images
+    kind: dataObject
+    name: Container images
+    description: OCI images and tags the registry distributes; its storage backend is a stated omission.
+    owner: gitlab-stage-package
+  - id: gitaly-rpc-interface
+    kind: applicationInterface
+    name: Gitaly gRPC interface
+    description: The surface gitaly exposes; the contract lives here.
+  - id: git-storage-service
+    kind: applicationService
+    name: Git storage service
+    description: The promise gitaly delivers to its consumers.
+    owner: gitlab-gitaly-team
+    status: current
+  - id: ssh-endpoint
+    kind: applicationInterface
+    name: SSH endpoint
+    description: The surface gitlab-shell exposes; the contract lives here.
+  - id: git-ssh-service
+    kind: applicationService
+    name: Git-over-SSH service
+    description: The promise gitlab-shell delivers to its consumers.
+    owner: gitlab-stage-create
+    status: current
+  - id: http-endpoint
+    kind: applicationInterface
+    name: HTTP front door
+    description: The surface workhorse exposes; the contract lives here.
+  - id: http-gateway-service
+    kind: applicationService
+    name: HTTP gateway service
+    description: The promise workhorse delivers to its consumers.
+    owner: gitlab-stage-create
+    status: current
+  - id: pages-http-interface
+    kind: applicationInterface
+    name: Pages HTTP interface
+    description: The surface gitlab-pages exposes; the contract lives here.
+  - id: static-site-service
+    kind: applicationService
+    name: Static site service
+    description: The promise gitlab-pages delivers to its consumers.
+    owner: gitlab-stage-deploy
+    status: current
+  - id: oci-api-interface
+    kind: applicationInterface
+    name: OCI registry API
+    description: The surface container-registry exposes; the contract lives here.
+  - id: image-distribution-service
+    kind: applicationService
+    name: Image distribution service
+    description: The promise container-registry delivers to its consumers.
+    owner: gitlab-stage-package
+    status: current
+  - id: agent-grpc-interface
+    kind: applicationInterface
+    name: Agent gRPC interface
+    description: The surface kas exposes; the contract lives here.
+  - id: cluster-connectivity-service
+    kind: applicationService
+    name: Cluster connectivity service
+    description: The promise kas delivers to its consumers.
+    owner: gitlab-stage-deploy
+    status: current
+  - id: email-ingestion
+    kind: applicationFunction
+    name: Email ingestion
+    description: The behaviour mailroom performs.
+  - id: inbound-email-service
+    kind: applicationService
+    name: Inbound email service
+    description: The promise mailroom delivers.
+    owner: gitlab-core-platform
+    status: current
+  - id: index-maintenance
+    kind: applicationFunction
+    name: Index maintenance
+    description: The behaviour search-indexers performs.
+  - id: code-search-service
+    kind: applicationService
+    name: Code search service
+    description: The promise search-indexers delivers.
+    owner: gitlab-global-search
+    status: current
+  - id: background-processing
+    kind: applicationFunction
+    name: Background processing
+    description: The behaviour sidekiq performs.
+  - id: async-execution-service
+    kind: applicationService
+    name: Asynchronous execution service
+    description: The promise sidekiq delivers.
+    owner: gitlab-core-platform
+    status: current
+  - id: job-execution
+    kind: applicationFunction
+    name: CI job execution
+    description: The behaviour gitlab-runner performs.
+  - id: ci-execution-service
+    kind: applicationService
+    name: CI execution service
+    description: The promise gitlab-runner delivers.
+    owner: gitlab-stage-verify
+    status: current
+  - id: customer-infrastructure
+    kind: node
+    name: Customer infrastructure
+    description: Wherever the adopting team runs its runners; outside GitLab the product, honestly modelled as such.
+  - id: run-gitlab-services
+    kind: technologyFunction
+    name: Run GitLab services
+    description: Process supervision for every component the instance hosts.
+  - id: run-runners
+    kind: technologyFunction
+    name: Run CI runners
+    description: Executes registered runners outside GitLab the product.
+  - id: data-persistence
+    kind: technologyFunction
+    name: Data persistence
+    description: Durable storage for the application metadata.
+  - id: queue-brokering
+    kind: technologyFunction
+    name: Queue brokering
+    description: Holds queues, cache, and sessions for the processes that poll them.
+  - id: source-code-management
+    kind: capability
+    name: Source code management
+    description: Hosting, pushing, and reviewing code; the Create stage in GitLab terms.
+    status: current
+    owner: gitlab-stage-create
+  - id: code-review
+    kind: capability
+    name: Code review
+    description: Merge requests, approvals, and diffs.
+    status: current
+    owner: gitlab-stage-create
+  - id: continuous-integration
+    kind: capability
+    name: Continuous integration
+    description: Pipelines from push to verified; the Verify stage.
+    status: current
+    owner: gitlab-stage-verify
+  - id: package-distribution
+    kind: capability
+    name: Package distribution
+    description: Container images and artifacts consumers pull; the Package stage.
+    status: current
+    owner: gitlab-stage-package
+  - id: code-search
+    kind: capability
+    name: Code search
+    description: Finding code across the instance; Zoekt-backed.
+    status: current
+    owner: gitlab-global-search
+  - id: domain-events
+    kind: applicationEvent
+    name: Domain events
+    description: 62 event classes under app/events published through Gitlab::EventStore; collapsed to one event at showcase grain.
+  - id: feature-flag-evaluation
+    kind: applicationFunction
+    name: Feature flag evaluation
+    description: Gates behaviour behind per-actor flags; an architectural pillar of how GitLab ships.
+  - id: feature-flag-definitions
+    kind: dataObject
+    name: Feature flag definitions
+    description: 559 YAML definitions under config/feature_flags at v19.3.0.
+    owner: gitlab-core-platform
+  - id: es-indexer
+    kind: applicationComponent
+    name: Elasticsearch indexer
+    description: The incumbent search indexer, pinned at 5.14.7; being replaced by Zoekt for code search per GitLab's public direction.
+    owner: gitlab-global-search
+    status: current
+    presentIn:
+      - single-instance
+  - id: zoekt-search
+    kind: applicationComponent
+    name: Zoekt
+    description: The code-search engine, pinned at 1.16.1, superseding the Elasticsearch indexer for code search.
+    owner: gitlab-global-search
+    status: current
+    supersedes:
+      - es-indexer
+    presentIn:
+      - single-instance
+      - cells-target
+  - id: praefect
+    kind: applicationComponent
+    name: Praefect
+    description: The Gitaly cluster router GitLab's architecture page declares. Not present in the FOSS tree at v19.3.0; kept in the model so the evidence can say so instead of the omission being silent.
+    owner: gitlab-gitaly-team
+    status: current
+relationships:
+  # The monolith's behaviour
+  - id: rails-assigned-rest-api
+    kind: assignment
+    from: gitlab-rails
+    to: rest-api
+  - id: rails-assigned-graphql
+    kind: assignment
+    from: gitlab-rails
+    to: graphql-api
+  - id: rails-assigned-web-ui
+    kind: assignment
+    from: gitlab-rails
+    to: web-ui
+  - id: rails-assigned-integrations
+    kind: assignment
+    from: gitlab-rails
+    to: integrations-framework
+  # Who serves whom (provider to consumer)
+  - id: web-ui-serves-developer
+    kind: serving
+    from: web-ui
+    to: developer
+  - id: graphql-serves-web-ui
+    kind: serving
+    from: graphql-api
+    to: web-ui
+  - id: rest-api-serves-shell
+    kind: serving
+    from: rest-api
+    to: gitlab-shell
+    description: >-
+      gitlab-shell authorizes every SSH session against the internal API
+      before any git data moves.
+  - id: rails-serves-workhorse
+    kind: serving
+    from: gitlab-rails
+    to: workhorse
+    description: Workhorse proxies everything it does not handle itself to Puma.
+  - id: rails-serves-registry
+    kind: serving
+    from: gitlab-rails
+    to: container-registry
+    description: Token-based authentication for registry operations.
+  - id: postgres-serves-rails
+    kind: serving
+    from: postgresql
+    to: gitlab-rails
+  - id: postgres-serves-sidekiq
+    kind: serving
+    from: postgresql
+    to: sidekiq
+  - id: redis-serves-rails
+    kind: serving
+    from: redis
+    to: gitlab-rails
+  - id: redis-serves-sidekiq
+    kind: serving
+    from: redis
+    to: sidekiq
+  # Information access
+  - id: gitaly-accesses-repositories
+    kind: access
+    from: gitaly
+    to: git-repositories
+    mode: read-write
+  - id: rails-accesses-metadata
+    kind: access
+    from: gitlab-rails
+    to: application-metadata
+    mode: read-write
+  - id: sidekiq-accesses-metadata
+    kind: access
+    from: sidekiq
+    to: application-metadata
+    mode: read-write
+  - id: rails-accesses-queues
+    kind: access
+    from: gitlab-rails
+    to: job-queues
+    mode: read-write
+  - id: sidekiq-accesses-queues
+    kind: access
+    from: sidekiq
+    to: job-queues
+    mode: read-write
+  # Flows
+  - id: rails-enqueues-sidekiq
+    kind: flow
+    from: gitlab-rails
+    to: sidekiq
+    content: Background jobs
+  - id: mailroom-flows-sidekiq
+    kind: flow
+    from: mailroom
+    to: sidekiq
+    content: Inbound email jobs
+  - id: integrations-flow-external
+    kind: flow
+    from: integrations-framework
+    to: developer
+    content: >-
+      Notifications and hooks to external services (Slack, Jira, and 52
+      more providers); the external systems themselves are a stated
+      omission, so the flow lands on the actor who experiences them.
+  - id: rails-assigned-pipeline-processing
+    kind: assignment
+    from: gitlab-rails
+    to: pipeline-processing
+  - id: rails-assigned-yaml-processor
+    kind: assignment
+    from: gitlab-rails
+    to: yaml-processor
+  - id: rails-assigned-runner-api
+    kind: assignment
+    from: gitlab-rails
+    to: runner-api
+  - id: yaml-processor-serves-pipeline-processing
+    kind: serving
+    from: yaml-processor
+    to: pipeline-processing
+  - id: yaml-processor-reads-ci-config
+    kind: access
+    from: yaml-processor
+    to: ci-config
+    mode: read
+  - id: pipeline-processing-accesses-pipelines
+    kind: access
+    from: pipeline-processing
+    to: ci-pipeline-record
+    mode: read-write
+  - id: runner-api-serves-runner
+    kind: serving
+    from: runner-api
+    to: gitlab-runner
+  - id: runner-api-accesses-artifacts
+    kind: access
+    from: runner-api
+    to: job-artifacts
+    mode: read-write
+  - id: runner-api-accesses-pipelines
+    kind: access
+    from: runner-api
+    to: ci-pipeline-record
+    mode: read-write
+  - id: sidekiq-flows-pipeline-processing
+    kind: flow
+    from: sidekiq
+    to: pipeline-processing
+    content: Asynchronous pipeline advancement
+  - id: rails-assigned-mr-processing
+    kind: assignment
+    from: gitlab-rails
+    to: merge-request-processing
+  - id: mr-processing-accesses-mrs
+    kind: access
+    from: merge-request-processing
+    to: merge-request-record
+    mode: read-write
+  - id: mr-processing-flows-pipeline-processing
+    kind: flow
+    from: merge-request-processing
+    to: pipeline-processing
+    content: Merge request pipelines
+  - id: rails-assigned-authentication
+    kind: assignment
+    from: gitlab-rails
+    to: authentication
+  - id: authentication-accesses-users
+    kind: access
+    from: authentication
+    to: user-accounts
+    mode: read-write
+  - id: authentication-serves-web-ui
+    kind: serving
+    from: authentication
+    to: web-ui
+  - id: authentication-serves-rest-api
+    kind: serving
+    from: authentication
+    to: rest-api
+  - id: rails-assigned-webhooks
+    kind: assignment
+    from: gitlab-rails
+    to: webhooks
+  - id: sidekiq-flows-webhooks
+    kind: flow
+    from: sidekiq
+    to: webhooks
+    content: Asynchronous hook delivery
+  - id: webhooks-serve-integrations
+    kind: serving
+    from: webhooks
+    to: integrations-framework
+    description: Service hooks are the delivery mechanism several integrations ride on.
+  - id: sprawl-influences-goal
+    kind: influence
+    from: toolchain-sprawl
+    to: single-devsecops-platform
+  - id: teams-influence-goal
+    kind: influence
+    from: development-teams
+    to: single-devsecops-platform
+  - id: outcome-realizes-goal
+    kind: realization
+    from: shorter-cycle-time
+    to: single-devsecops-platform
+  - id: rails-realizes-goal
+    kind: realization
+    from: gitlab-rails
+    to: single-devsecops-platform
+  - id: gitaly-constraint-association
+    kind: association
+    from: git-io-through-gitaly
+    to: gitaly
+  - id: gitaly-constraint-repos
+    kind: association
+    from: git-io-through-gitaly
+    to: git-repositories
+  - id: license-constraint-rails
+    kind: association
+    from: foss-mit-license
+    to: gitlab-rails
+  - id: pipeline-processing-realizes-outcome
+    kind: realization
+    from: pipeline-processing
+    to: shorter-cycle-time
+    description: "CI is the cycle-time machine: the push-to-verified loop is what shortens idea-to-production."
+  - id: sprawl-influences-outcome
+    kind: influence
+    from: toolchain-sprawl
+    to: shorter-cycle-time
+    description: "The same pressure behind the platform goal: tool-hopping is where cycle time goes to die. Source: GitLab's public messaging."
+  - id: developer-performs-develop
+    kind: assignment
+    from: developer
+    to: develop-software
+  - id: gitlab-stage-create-performs-maintain
+    kind: assignment
+    from: gitlab-stage-create
+    to: maintain-gitlab
+  - id: gitlab-stage-verify-performs-maintain
+    kind: assignment
+    from: gitlab-stage-verify
+    to: maintain-gitlab
+  - id: gitlab-stage-package-performs-maintain
+    kind: assignment
+    from: gitlab-stage-package
+    to: maintain-gitlab
+  - id: gitlab-stage-deploy-performs-maintain
+    kind: assignment
+    from: gitlab-stage-deploy
+    to: maintain-gitlab
+  - id: gitlab-gitaly-team-performs-maintain
+    kind: assignment
+    from: gitlab-gitaly-team
+    to: maintain-gitlab
+  - id: gitlab-core-platform-performs-maintain
+    kind: assignment
+    from: gitlab-core-platform
+    to: maintain-gitlab
+  - id: gitlab-global-search-performs-maintain
+    kind: assignment
+    from: gitlab-global-search
+    to: maintain-gitlab
+  - id: rails-realizes-rest-api
+    kind: realization
+    from: gitlab-rails
+    to: rest-api
+  - id: rails-realizes-graphql-api
+    kind: realization
+    from: gitlab-rails
+    to: graphql-api
+  - id: rails-realizes-web-ui
+    kind: realization
+    from: gitlab-rails
+    to: web-ui
+  - id: rails-realizes-runner-api
+    kind: realization
+    from: gitlab-rails
+    to: runner-api
+  - id: instance-serves-gitlab-rails
+    kind: serving
+    from: gitlab-instance
+    to: gitlab-rails
+  - id: instance-serves-sidekiq
+    kind: serving
+    from: gitlab-instance
+    to: sidekiq
+  - id: instance-serves-workhorse
+    kind: serving
+    from: gitlab-instance
+    to: workhorse
+  - id: instance-serves-gitaly
+    kind: serving
+    from: gitlab-instance
+    to: gitaly
+  - id: instance-serves-gitlab-shell
+    kind: serving
+    from: gitlab-instance
+    to: gitlab-shell
+  - id: instance-serves-gitlab-pages
+    kind: serving
+    from: gitlab-instance
+    to: gitlab-pages
+  - id: instance-serves-container-registry
+    kind: serving
+    from: gitlab-instance
+    to: container-registry
+  - id: instance-serves-kas
+    kind: serving
+    from: gitlab-instance
+    to: kas
+  - id: instance-serves-mailroom
+    kind: serving
+    from: gitlab-instance
+    to: mailroom
+  - id: gitaly-composes-gitaly-rpc-interface
+    kind: composition
+    from: gitaly
+    to: gitaly-rpc-interface
+  - id: gitaly-rpc-interface-exposes-git-storage-service
+    kind: assignment
+    from: gitaly-rpc-interface
+    to: git-storage-service
+  - id: gitaly-realizes-git-storage-service
+    kind: realization
+    from: gitaly
+    to: git-storage-service
+  - id: gitaly-rpc-interface-accesses-git-repositories
+    kind: access
+    from: gitaly-rpc-interface
+    to: git-repositories
+    mode: read-write
+  - id: git-storage-service-serves-gitlab-rails
+    kind: serving
+    from: git-storage-service
+    to: gitlab-rails
+  - id: git-storage-service-serves-gitlab-shell
+    kind: serving
+    from: git-storage-service
+    to: gitlab-shell
+  - id: git-storage-service-serves-workhorse
+    kind: serving
+    from: git-storage-service
+    to: workhorse
+  - id: git-storage-service-serves-merge-request-processing
+    kind: serving
+    from: git-storage-service
+    to: merge-request-processing
+  - id: gitlab-shell-composes-ssh-endpoint
+    kind: composition
+    from: gitlab-shell
+    to: ssh-endpoint
+  - id: ssh-endpoint-exposes-git-ssh-service
+    kind: assignment
+    from: ssh-endpoint
+    to: git-ssh-service
+  - id: gitlab-shell-realizes-git-ssh-service
+    kind: realization
+    from: gitlab-shell
+    to: git-ssh-service
+  - id: ssh-endpoint-accesses-user-accounts
+    kind: access
+    from: ssh-endpoint
+    to: user-accounts
+    mode: read
+  - id: git-ssh-service-serves-developer
+    kind: serving
+    from: git-ssh-service
+    to: developer
+  - id: workhorse-composes-http-endpoint
+    kind: composition
+    from: workhorse
+    to: http-endpoint
+  - id: http-endpoint-exposes-http-gateway-service
+    kind: assignment
+    from: http-endpoint
+    to: http-gateway-service
+  - id: workhorse-realizes-http-gateway-service
+    kind: realization
+    from: workhorse
+    to: http-gateway-service
+  - id: http-endpoint-accesses-job-artifacts
+    kind: access
+    from: http-endpoint
+    to: job-artifacts
+    mode: read-write
+  - id: http-gateway-service-serves-developer
+    kind: serving
+    from: http-gateway-service
+    to: developer
+  - id: gitlab-pages-composes-pages-http-interface
+    kind: composition
+    from: gitlab-pages
+    to: pages-http-interface
+  - id: pages-http-interface-exposes-static-site-service
+    kind: assignment
+    from: pages-http-interface
+    to: static-site-service
+  - id: gitlab-pages-realizes-static-site-service
+    kind: realization
+    from: gitlab-pages
+    to: static-site-service
+  - id: pages-http-interface-accesses-job-artifacts
+    kind: access
+    from: pages-http-interface
+    to: job-artifacts
+    mode: read
+  - id: static-site-service-serves-developer
+    kind: serving
+    from: static-site-service
+    to: developer
+  - id: container-registry-composes-oci-api-interface
+    kind: composition
+    from: container-registry
+    to: oci-api-interface
+  - id: oci-api-interface-exposes-image-distribution-service
+    kind: assignment
+    from: oci-api-interface
+    to: image-distribution-service
+  - id: container-registry-realizes-image-distribution-service
+    kind: realization
+    from: container-registry
+    to: image-distribution-service
+  - id: oci-api-interface-accesses-container-images
+    kind: access
+    from: oci-api-interface
+    to: container-images
+    mode: read-write
+  - id: image-distribution-service-serves-developer
+    kind: serving
+    from: image-distribution-service
+    to: developer
+  - id: kas-composes-agent-grpc-interface
+    kind: composition
+    from: kas
+    to: agent-grpc-interface
+  - id: agent-grpc-interface-exposes-cluster-connectivity-service
+    kind: assignment
+    from: agent-grpc-interface
+    to: cluster-connectivity-service
+  - id: kas-realizes-cluster-connectivity-service
+    kind: realization
+    from: kas
+    to: cluster-connectivity-service
+  - id: agent-grpc-interface-accesses-application-metadata
+    kind: access
+    from: agent-grpc-interface
+    to: application-metadata
+    mode: read
+  - id: cluster-connectivity-service-serves-gitlab-rails
+    kind: serving
+    from: cluster-connectivity-service
+    to: gitlab-rails
+  - id: mailroom-assigned-email-ingestion
+    kind: assignment
+    from: mailroom
+    to: email-ingestion
+  - id: mailroom-realizes-inbound-email-service
+    kind: realization
+    from: mailroom
+    to: inbound-email-service
+  - id: email-ingestion-accesses-job-queues
+    kind: access
+    from: email-ingestion
+    to: job-queues
+    mode: write
+  - id: index-maintenance-accesses-git-repositories
+    kind: access
+    from: index-maintenance
+    to: git-repositories
+    mode: read
+  - id: code-search-service-serves-gitlab-rails
+    kind: serving
+    from: code-search-service
+    to: gitlab-rails
+  - id: sidekiq-assigned-background-processing
+    kind: assignment
+    from: sidekiq
+    to: background-processing
+  - id: sidekiq-realizes-async-execution-service
+    kind: realization
+    from: sidekiq
+    to: async-execution-service
+  - id: gitlab-runner-assigned-job-execution
+    kind: assignment
+    from: gitlab-runner
+    to: job-execution
+  - id: gitlab-runner-realizes-ci-execution-service
+    kind: realization
+    from: gitlab-runner
+    to: ci-execution-service
+  - id: inbound-email-serves-rails
+    kind: serving
+    from: inbound-email-service
+    to: gitlab-rails
+  - id: async-execution-serves-rails
+    kind: serving
+    from: async-execution-service
+    to: gitlab-rails
+  - id: ci-execution-serves-pipelines
+    kind: serving
+    from: ci-execution-service
+    to: pipeline-processing
+  - id: rest-api-accesses-metadata
+    kind: access
+    from: rest-api
+    to: application-metadata
+    mode: read-write
+  - id: graphql-accesses-metadata
+    kind: access
+    from: graphql-api
+    to: application-metadata
+    mode: read-write
+  - id: web-ui-accesses-metadata
+    kind: access
+    from: web-ui
+    to: application-metadata
+    mode: read-write
+  - id: customer-infra-serves-runner
+    kind: serving
+    from: customer-infrastructure
+    to: gitlab-runner
+  - id: async-execution-service-accesses-job-queues
+    kind: access
+    from: async-execution-service
+    to: job-queues
+    mode: read-write
+  - id: ci-execution-service-accesses-job-artifacts
+    kind: access
+    from: ci-execution-service
+    to: job-artifacts
+    mode: read-write
+  - id: cluster-connectivity-service-accesses-application-metadata
+    kind: access
+    from: cluster-connectivity-service
+    to: application-metadata
+    mode: read
+  - id: code-search-service-accesses-git-repositories
+    kind: access
+    from: code-search-service
+    to: git-repositories
+    mode: read
+  - id: git-ssh-service-accesses-git-repositories
+    kind: access
+    from: git-ssh-service
+    to: git-repositories
+    mode: read-write
+  - id: git-storage-service-accesses-git-repositories
+    kind: access
+    from: git-storage-service
+    to: git-repositories
+    mode: read-write
+  - id: http-gateway-service-accesses-job-artifacts
+    kind: access
+    from: http-gateway-service
+    to: job-artifacts
+    mode: read-write
+  - id: image-distribution-service-accesses-container-images
+    kind: access
+    from: image-distribution-service
+    to: container-images
+    mode: read-write
+  - id: inbound-email-service-accesses-job-queues
+    kind: access
+    from: inbound-email-service
+    to: job-queues
+    mode: write
+  - id: static-site-service-accesses-job-artifacts
+    kind: access
+    from: static-site-service
+    to: job-artifacts
+    mode: read
+  - id: gitlab-instance-performs-run-gitlab-services
+    kind: assignment
+    from: gitlab-instance
+    to: run-gitlab-services
+  - id: customer-infrastructure-performs-run-runners
+    kind: assignment
+    from: customer-infrastructure
+    to: run-runners
+  - id: postgresql-performs-data-persistence
+    kind: assignment
+    from: postgresql
+    to: data-persistence
+  - id: redis-performs-queue-brokering
+    kind: assignment
+    from: redis
+    to: queue-brokering
+  - id: source-code-management-realizes-goal
+    kind: realization
+    from: source-code-management
+    to: single-devsecops-platform
+  - id: code-review-realizes-goal
+    kind: realization
+    from: code-review
+    to: single-devsecops-platform
+  - id: continuous-integration-realizes-goal
+    kind: realization
+    from: continuous-integration
+    to: single-devsecops-platform
+  - id: package-distribution-realizes-goal
+    kind: realization
+    from: package-distribution
+    to: single-devsecops-platform
+  - id: code-search-realizes-goal
+    kind: realization
+    from: code-search
+    to: single-devsecops-platform
+  - id: git-storage-service-realizes-source-code-management
+    kind: realization
+    from: git-storage-service
+    to: source-code-management
+  - id: git-ssh-service-realizes-source-code-management
+    kind: realization
+    from: git-ssh-service
+    to: source-code-management
+  - id: http-gateway-service-realizes-source-code-management
+    kind: realization
+    from: http-gateway-service
+    to: source-code-management
+  - id: merge-request-processing-realizes-code-review
+    kind: realization
+    from: merge-request-processing
+    to: code-review
+  - id: pipeline-processing-realizes-continuous-integration
+    kind: realization
+    from: pipeline-processing
+    to: continuous-integration
+  - id: ci-execution-service-realizes-continuous-integration
+    kind: realization
+    from: ci-execution-service
+    to: continuous-integration
+  - id: image-distribution-service-realizes-package-distribution
+    kind: realization
+    from: image-distribution-service
+    to: package-distribution
+  - id: code-search-service-realizes-code-search
+    kind: realization
+    from: code-search-service
+    to: code-search
+  - id: pipeline-events
+    kind: triggering
+    from: pipeline-processing
+    to: domain-events
+  - id: mr-events
+    kind: triggering
+    from: merge-request-processing
+    to: domain-events
+  - id: events-trigger-workers
+    kind: triggering
+    from: domain-events
+    to: background-processing
+  - id: rails-assigned-flag-evaluation
+    kind: assignment
+    from: gitlab-rails
+    to: feature-flag-evaluation
+  - id: flag-evaluation-reads-definitions
+    kind: access
+    from: feature-flag-evaluation
+    to: feature-flag-definitions
+    mode: read
+  - id: zoekt-assigned-index-maintenance
+    kind: assignment
+    from: zoekt-search
+    to: index-maintenance
+  - id: zoekt-realizes-code-search
+    kind: realization
+    from: zoekt-search
+    to: code-search-service
+  - id: es-realizes-code-search
+    kind: realization
+    from: es-indexer
+    to: code-search-service
+  - id: sidekiq-flows-zoekt
+    kind: flow
+    from: sidekiq
+    to: zoekt-search
+  - id: instance-serves-zoekt
+    kind: serving
+    from: gitlab-instance
+    to: zoekt-search
+  - id: instance-serves-es
+    kind: serving
+    from: gitlab-instance
+    to: es-indexer
+  - id: praefect-association-gitaly
+    kind: association
+    from: praefect
+    to: gitaly
+  - id: es-assigned-index-maintenance
+    kind: assignment
+    from: es-indexer
+    to: index-maintenance
+  - id: praefect-realizes-git-storage
+    kind: realization
+    from: praefect
+    to: git-storage-service
+    description: "As declared upstream: Praefect fronts Gitaly storage nodes. Not observed in the FOSS tree; the evidence overlay records that."
+  - id: instance-serves-praefect
+    kind: serving
+    from: gitlab-instance
+    to: praefect
+    description: Hosted by the instance where deployed; absent from FOSS.
