@@ -97,9 +97,7 @@ concepts:
         ref: git-io-through-gitaly
     kind: applicationComponent
     name: Gitaly
-    description: >-
-      Git RPC service owning all repository access; pinned at 19.3.0 by
-      GITALY_SERVER_VERSION. Praefect clustering is a stated omission.
+    description: Git RPC service owning all repository access; pinned at 19.3.0 by GITALY_SERVER_VERSION. Praefect, which routes across Gitaly replicas in a cluster deployment, is modelled beside it.
     owner: gitlab-gitaly-team
     status: current
   - id: gitlab-shell
@@ -176,7 +174,7 @@ concepts:
   - id: pipeline-processing
     kind: applicationFunction
     name: Pipeline processing
-    description: "Creates and advances CI pipelines: 97 service objects under app/services/ci at v19.3.0, entered through CreatePipelineService. The behaviour behind GitLab's defining feature."
+    description: "\"Creates and advances CI pipelines: 68 service objects directly under app/services/ci at v19.3.0 (170 including nested), entered through CreatePipelineService. The behaviour behind GitLab's defining feature.\""
   - id: yaml-processor
     kind: applicationFunction
     name: CI YAML processor
@@ -190,7 +188,7 @@ concepts:
   - id: ci-pipeline-record
     kind: dataObject
     name: CI pipelines, stages, and jobs
-    description: "The pipeline domain records (app/models/ci: pipeline.rb, stage.rb, build.rb among 81 models)."
+    description: '"The pipeline domain records (app/models/ci: pipeline.rb, stage.rb, build.rb among 74 model files directly under that directory)."'
     owner: gitlab-stage-verify
   - id: ci-config
     kind: dataObject
@@ -205,7 +203,7 @@ concepts:
   - id: merge-request-processing
     kind: applicationFunction
     name: Merge request processing
-    description: "Creating, updating, approving, and merging MRs: 57 service objects under app/services/merge_requests at v19.3.0."
+    description: '"Creating, updating, approving, and merging MRs: 51 service objects directly under app/services/merge_requests at v19.3.0."'
   - id: merge-request-record
     kind: dataObject
     name: Merge requests and diffs
@@ -243,7 +241,7 @@ concepts:
   - id: git-io-through-gitaly
     kind: constraint
     name: All git I/O through Gitaly
-    description: "No component reads repository storage directly; every git operation crosses Gitaly's RPC surface. GitLab's own architecture documentation states the rule, and the tree shows it: the monolith, Workhorse, and Shell all carry Gitaly clients rather than filesystem access."
+    description: "\"Every component that reads or writes repository content reaches it through Gitaly's RPC surface rather than the filesystem. GitLab's own architecture documentation states the rule, and the tree shows it: the monolith, Workhorse and Shell all carry Gitaly clients rather than filesystem access. In this model the rule is visible as the route: the accessors of git-repositories are served by git-storage-service, which only Gitaly realizes. Nothing checks that mechanically today (yarramate#280), so it is a stated rule, not an enforced one.\""
   - id: foss-mit-license
     kind: constraint
     name: FOSS edition is MIT
@@ -454,31 +452,36 @@ concepts:
   - id: feature-flag-definitions
     kind: dataObject
     name: Feature flag definitions
-    description: 559 YAML definitions under config/feature_flags at v19.3.0.
+    description: 544 YAML definitions under config/feature_flags at v19.3.0, counted recursively.
     owner: gitlab-core-platform
   - id: es-indexer
     kind: applicationComponent
     name: Elasticsearch indexer
-    description: The incumbent search indexer, pinned at 5.14.7; being replaced by Zoekt for code search per GitLab's public direction.
+    description: The Elasticsearch indexer, pinned at 5.14.7. Zoekt takes over code search, but this indexer feeds every other search scope (comments, commits, epics, issues, merge requests, milestones, projects, users, wikis), so it survives into the target rather than being replaced.
     owner: gitlab-global-search
     status: current
     presentIn:
       - single-instance
+      - cells-target
   - id: zoekt-search
     kind: applicationComponent
     name: Zoekt
-    description: The code-search engine, pinned at 1.16.1, superseding the Elasticsearch indexer for code search.
+    description: The code-search engine, pinned at 1.16.1. It takes over code search from the Elasticsearch indexer and explicitly does not replace it for any other search scope, so the succession is partial. yarramate cannot express a scoped succession today (yarramate#281), so no supersedes edge is recorded rather than record an unqualified one that the source contradicts.
     owner: gitlab-global-search
     status: current
-    supersedes:
-      - es-indexer
     presentIn:
       - single-instance
       - cells-target
   - id: praefect
     kind: applicationComponent
     name: Praefect
-    description: The Gitaly cluster router GitLab's architecture page declares. Not present in the FOSS tree at v19.3.0; kept in the model so the evidence can say so instead of the omission being silent.
+    description: "The Gitaly cluster router. Declared on GitLab's architecture page and present in the FOSS tree at v19.3.0 as a client surface: Rails holds a PraefectInfoService gRPC client and calls its repository_replicas RPC to read replica state. The Praefect server itself is a separate binary, so the tree carries the consumer side and the operational documentation rather than a version pin."
+    owner: gitlab-gitaly-team
+    status: current
+  - id: repository-replica-routing
+    kind: applicationFunction
+    name: Repository replica routing
+    description: "Routing repository access across Gitaly storage replicas and answering which replicas hold a repository. This is the behaviour that makes Praefect a structural element rather than a label: the tree carries the client side of its replica RPC, and the in-tree operator documentation covers configuring, monitoring and recovering replicas."
     owner: gitlab-gitaly-team
     status: current
 relationships:
@@ -949,11 +952,6 @@ relationships:
     from: email-ingestion
     to: job-queues
     mode: write
-  - id: index-maintenance-accesses-git-repositories
-    kind: access
-    from: index-maintenance
-    to: git-repositories
-    mode: read
   - id: code-search-service-serves-gitlab-rails
     kind: serving
     from: code-search-service
@@ -1020,16 +1018,6 @@ relationships:
     from: cluster-connectivity-service
     to: application-metadata
     mode: read
-  - id: code-search-service-accesses-git-repositories
-    kind: access
-    from: code-search-service
-    to: git-repositories
-    mode: read
-  - id: git-ssh-service-accesses-git-repositories
-    kind: access
-    from: git-ssh-service
-    to: git-repositories
-    mode: read-write
   - id: git-storage-service-accesses-git-repositories
     kind: access
     from: git-storage-service
@@ -1180,9 +1168,56 @@ relationships:
     kind: realization
     from: praefect
     to: git-storage-service
-    description: "As declared upstream: Praefect fronts Gitaly storage nodes. Not observed in the FOSS tree; the evidence overlay records that."
+    description: Praefect fronts Gitaly storage nodes and routes repository access across replicas, as the architecture page declares and the replica RPC in the tree corroborates.
   - id: instance-serves-praefect
     kind: serving
     from: gitlab-instance
     to: praefect
-    description: Hosted by the instance where deployed; absent from FOSS.
+    description: Hosted by the instance where Gitaly Cluster is deployed.
+  - id: praefect-assigned-replica-routing
+    kind: assignment
+    from: praefect
+    to: repository-replica-routing
+  - id: git-storage-service-serves-index-maintenance
+    kind: serving
+    from: git-storage-service
+    to: index-maintenance
+    description: Indexers read repository content over Gitaly's RPC surface, not from the disk.
+  - id: git-storage-service-serves-code-search-service
+    kind: serving
+    from: git-storage-service
+    to: code-search-service
+    description: Code search reads repository content over Gitaly's RPC surface.
+  - id: git-storage-service-serves-git-ssh-service
+    kind: serving
+    from: git-storage-service
+    to: git-ssh-service
+    description: gitlab-shell holds no repository storage of its own; a push or fetch over SSH is proxied to Gitaly.
+  - id: http-gateway-service-serves-gitlab-rails
+    kind: serving
+    from: http-gateway-service
+    to: gitlab-rails
+    description: "Rails delegates to Workhorse rather than streaming itself: lib/gitlab/workhorse.rb sets Gitlab-Workhorse-Send-Data and hands off through send_git_blob, send_git_archive and send_git_diff. The model already records Rails serving Workhorse; this is the other direction, which the same file evidences."
+  - id: image-distribution-service-serves-gitlab-rails
+    kind: serving
+    from: image-distribution-service
+    to: gitlab-rails
+    description: "Rails is a client of the registry as well as its authoriser: lib/container_registry/client.rb is a Faraday client calling registry_info and repository_tags."
+  - id: index-maintenance-accesses-git-repositories
+    kind: access
+    from: index-maintenance
+    to: git-repositories
+    mode: read
+    description: Reads repository content to build indexes, over Gitaly's RPC surface rather than from disk; git-storage-service serves this function.
+  - id: code-search-service-accesses-git-repositories
+    kind: access
+    from: code-search-service
+    to: git-repositories
+    mode: read
+    description: Reads repository content over Gitaly's RPC surface; git-storage-service serves this service.
+  - id: git-ssh-service-accesses-git-repositories
+    kind: access
+    from: git-ssh-service
+    to: git-repositories
+    mode: read-write
+    description: A push or fetch over SSH reads and writes repository content, proxied to Gitaly; gitlab-shell holds no repository storage of its own.

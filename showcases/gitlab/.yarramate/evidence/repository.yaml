@@ -79,10 +79,10 @@ observations:
       uri: repo:GITLAB_ELASTICSEARCH_INDEXER_VERSION
       message: Pinned 5.14.7; the incumbent Zoekt supersedes.
   - subject: praefect
-    result: not-observed
+    result: confirmed
     evidence:
-      uri: repo:GITALY_SERVER_VERSION
-      message: Declared on GitLab's architecture page beside Gitaly; no version pin, directory, or client for it exists in the FOSS tree at v19.3.0.
+      uri: repo:lib/gitlab/gitaly_client/praefect_info_service.rb
+      message: class PraefectInfoService, whose replicas method calls gitaly_client_call(@storage, :praefect_info_service, :repository_replicas). Reached from lib/gitlab/git/repository.rb:1114 (praefect_info_client) and consumed at :1235 (replicas). lib/gitlab/setup_helper.rb:152 carries module Praefect, generating praefect.config.toml, praefect.socket and the praefect_test database, and doc/administration/gitaly/praefect/ documents operating it. There is no PRAEFECT_* version pin at the root, because the server ships separately.
   - subject: domain-events
     result: confirmed
     evidence:
@@ -97,7 +97,7 @@ observations:
     result: confirmed
     evidence:
       uri: repo:config/feature_flags
-      message: The definitions themselves, one YAML per flag.
+      message: 544 .yml definitions under config/feature_flags at v19.3.0, counted recursively; the directory holds no files at its top level, only eight subdirectories.
   - subject: gitlab-runner
     result: confirmed
     evidence:
@@ -117,7 +117,7 @@ observations:
     result: confirmed
     evidence:
       uri: repo:app/services/ci/create_pipeline_service.rb
-      message: Entry point of the pipeline domain; 97 service objects under app/services/ci at v19.3.0.
+      message: Entry point of the pipeline domain; 68 service objects directly under app/services/ci at v19.3.0, 170 counting nested directories.
   - subject: yaml-processor
     result: confirmed
     evidence:
@@ -132,7 +132,7 @@ observations:
     result: confirmed
     evidence:
       uri: repo:app/models/ci/pipeline.rb
-      message: Pipeline domain records; stage.rb and build.rb beside it among 81 CI models.
+      message: Pipeline domain records; stage.rb and build.rb beside it among 74 model files directly under app/models/ci at v19.3.0.
   - subject: ci-config
     result: confirmed
     evidence:
@@ -147,7 +147,7 @@ observations:
     result: confirmed
     evidence:
       uri: repo:app/services/merge_requests/merge_service.rb
-      message: 57 MR service objects at v19.3.0; create_service.rb and merge_service.rb are the busy ends.
+      message: 51 MR service objects directly under app/services/merge_requests at v19.3.0 (78 including nested); create_service.rb and merge_service.rb are the busy ends.
   - subject: merge-request-record
     result: confirmed
     evidence:
@@ -211,7 +211,7 @@ observations:
     result: confirmed
     evidence:
       uri: repo:app/services/search
-      message: The search service layer the indexers feed.
+      message: "The query side of search: Search::GlobalService#execute returns Gitlab::SearchResults. The indexers do not feed these files; they write the indexes these files then query."
   - subject: async-execution-service
     result: confirmed
     evidence:
@@ -247,3 +247,29 @@ observations:
     evidence:
       uri: repo:config/feature_categories.yml
       message: global_search category; Zoekt-backed at this version.
+  - subject: repository-replica-routing
+    result: confirmed
+    evidence:
+      uri: repo:doc/administration/gitaly/praefect/recovery.md
+      message: The in-tree Praefect operator documentation (_index.md, configure.md, monitoring.md, recovery.md) covers routing and replica recovery across Gitaly nodes; the repository_replicas RPC in lib/gitlab/gitaly_client/praefect_info_service.rb is the client side of the replica query.
+  - subject: zoekt-search
+    key: declared-on-architecture-page
+    value: no
+    result: confirmed
+    evidence:
+      uri: repo:doc/development/architecture.md
+      message: "GITLAB_ZOEKT_VERSION is pinned at the repository root and doc/integration/zoekt/ documents it, but the architecture page names Zoekt only inside the mermaid diagram at :312-313. It has no component-list row and no component-details section. This is the mirror of the Praefect case: declared in the tree, undeclared in the page that is this model's intent source."
+  - subject: kas
+    key: architecture-page-edition
+    value: EE Only
+    result: confirmed
+    evidence:
+      uri: repo:doc/development/architecture.md
+      message: The component list marks GitLab agent for Kubernetes as "EE Only" at :388, yet GITLAB_KAS_VERSION 19.3.0 is pinned in this FOSS tree and the agent server is modelled from it. The page's edition column and the tree disagree.
+  - subject: es-indexer
+    key: architecture-page-edition
+    value: EE Only
+    result: confirmed
+    evidence:
+      uri: repo:doc/development/architecture.md
+      message: The component list marks Elasticsearch as "EE Only" at :383, yet GITLAB_ELASTICSEARCH_INDEXER_VERSION 5.14.7 is pinned in this FOSS tree. The page's edition column and the tree disagree.
