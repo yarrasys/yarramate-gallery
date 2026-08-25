@@ -3,17 +3,17 @@ id: replication-and-storage
 version: "1.0"
 query:
   subjects:
-    - kafka#broker
-    - kafka#replica-manager
-    - kafka#replica-fetcher
-    - kafka#log-manager
-    - kafka#partition-log
-    - kafka#log-segment
-    - kafka#topic
-    - kafka#topic-partition
-    - kafka#in-sync-replica-set
-    - kafka#high-watermark
-    - kafka#record
+    - broker
+    - replica-manager
+    - replica-fetcher
+    - log-manager
+    - partition-log
+    - log-segment
+    - topic
+    - topic-partition
+    - in-sync-replica-set
+    - high-watermark
+    - record
   relationships: between
 presentation:
   title: Replication and on-disk storage

@@ -3,207 +3,207 @@ id: kafka-likec4
 version: "1.0"
 adapter: likec4
 mappings:
-  - native: kafka#assignor-computes-assignment
+  - native: assignor-computes-assignment
     external: assignorComputesAssignment
     type: relationship
-  - native: kafka#assignor-reads-partitions
+  - native: assignor-reads-partitions
     external: assignorReadsPartitions
     type: relationship
-  - native: kafka#broker
+  - native: broker
     external: broker
     type: concept
-  - native: kafka#broker-acks-producer
+  - native: broker-acks-producer
     external: brokerAcksProducer
     type: relationship
-  - native: kafka#broker-appends-log
+  - native: broker-appends-log
     external: brokerAppendsLog
     type: relationship
-  - native: kafka#broker-composes-group-coordinator
+  - native: broker-composes-group-coordinator
     external: brokerComposesGroupCoordinator
     type: relationship
-  - native: kafka#broker-composes-log-manager
+  - native: broker-composes-log-manager
     external: brokerComposesLogManager
     type: relationship
-  - native: kafka#broker-composes-metadata-cache
+  - native: broker-composes-metadata-cache
     external: brokerComposesMetadataCache
     type: relationship
-  - native: kafka#broker-composes-replica-fetcher
+  - native: broker-composes-replica-fetcher
     external: brokerComposesReplicaFetcher
     type: relationship
-  - native: kafka#broker-composes-replica-manager
+  - native: broker-composes-replica-manager
     external: brokerComposesReplicaManager
     type: relationship
-  - native: kafka#broker-manages-partition
+  - native: broker-manages-partition
     external: brokerManagesPartition
     type: relationship
-  - native: kafka#broker-reads-metadata-cache
+  - native: broker-reads-metadata-cache
     external: brokerReadsMetadataCache
     type: relationship
-  - native: kafka#broker-replicates-followers
+  - native: broker-replicates-followers
     external: brokerReplicatesFollowers
     type: relationship
-  - native: kafka#cluster-composes-broker
+  - native: cluster-composes-broker
     external: clusterComposesBroker
     type: relationship
-  - native: kafka#cluster-composes-controller-quorum
+  - native: cluster-composes-controller-quorum
     external: clusterComposesControllerQuorum
     type: relationship
-  - native: kafka#cluster-composes-metadata-log
+  - native: cluster-composes-metadata-log
     external: clusterComposesMetadataLog
     type: relationship
-  - native: kafka#cluster-metadata-cache
+  - native: cluster-metadata-cache
     external: clusterMetadataCache
     type: concept
-  - native: kafka#consumer-app-composes-assignor
+  - native: consumer-app-composes-assignor
     external: consumerAppComposesAssignor
     type: relationship
-  - native: kafka#consumer-app-composes-consumer-client
+  - native: consumer-app-composes-consumer-client
     external: consumerAppComposesConsumerClient
     type: relationship
-  - native: kafka#consumer-application
+  - native: consumer-application
     external: consumerApplication
     type: concept
-  - native: kafka#consumer-client
+  - native: consumer-client
     external: consumerClient
     type: concept
-  - native: kafka#consumer-commits-offsets
+  - native: consumer-commits-offsets
     external: consumerCommitsOffsets
     type: relationship
-  - native: kafka#consumer-fetches-records
+  - native: consumer-fetches-records
     external: consumerFetchesRecords
     type: relationship
-  - native: kafka#consumer-group
+  - native: consumer-group
     external: consumerGroup
     type: concept
-  - native: kafka#consumer-joins-group
+  - native: consumer-joins-group
     external: consumerJoinsGroup
     type: relationship
-  - native: kafka#consumer-offsets
+  - native: consumer-offsets
     external: consumerOffsets
     type: concept
-  - native: kafka#controller
+  - native: controller
     external: controller
     type: concept
-  - native: kafka#controller-composes-metadata-cache
+  - native: controller-composes-metadata-cache
     external: controllerComposesMetadataCache
     type: relationship
-  - native: kafka#controller-composes-raft
+  - native: controller-composes-raft
     external: controllerComposesRaft
     type: relationship
-  - native: kafka#controller-manages-partitions
+  - native: controller-manages-partitions
     external: controllerManagesPartitions
     type: relationship
-  - native: kafka#controller-quorum
+  - native: controller-quorum
     external: controllerQuorum
     type: concept
-  - native: kafka#controller-writes-metadata-log
+  - native: controller-writes-metadata-log
     external: controllerWritesMetadataLog
     type: relationship
-  - native: kafka#coordinator-delivers-assignment
+  - native: coordinator-delivers-assignment
     external: coordinatorDeliversAssignment
     type: relationship
-  - native: kafka#coordinator-manages-group
+  - native: coordinator-manages-group
     external: coordinatorManagesGroup
     type: relationship
-  - native: kafka#coordinator-manages-offsets
+  - native: coordinator-manages-offsets
     external: coordinatorManagesOffsets
     type: relationship
-  - native: kafka#group-aggregates-consumer
+  - native: group-aggregates-consumer
     external: groupAggregatesConsumer
     type: relationship
-  - native: kafka#group-coordinator
+  - native: group-coordinator
     external: groupCoordinator
     type: concept
-  - native: kafka#high-watermark
+  - native: high-watermark
     external: highWatermark
     type: concept
-  - native: kafka#in-sync-replica-set
+  - native: in-sync-replica-set
     external: inSyncReplicaSet
     type: concept
-  - native: kafka#kafka-cluster
+  - native: kafka-cluster
     external: kafkaCluster
     type: concept
-  - native: kafka#log-appends-segment
+  - native: log-appends-segment
     external: logAppendsSegment
     type: relationship
-  - native: kafka#log-manager
+  - native: log-manager
     external: logManager
     type: concept
-  - native: kafka#log-manager-composes-partition-log
+  - native: log-manager-composes-partition-log
     external: logManagerComposesPartitionLog
     type: relationship
-  - native: kafka#log-segment
+  - native: log-segment
     external: logSegment
     type: concept
-  - native: kafka#metadata-log
+  - native: metadata-log
     external: metadataLog
     type: concept
-  - native: kafka#metadata-log-to-publisher
+  - native: metadata-log-to-publisher
     external: metadataLogToPublisher
     type: relationship
-  - native: kafka#metadata-publisher
+  - native: metadata-publisher
     external: metadataPublisher
     type: concept
-  - native: kafka#partition-assignor
+  - native: partition-assignor
     external: partitionAssignor
     type: concept
-  - native: kafka#partition-log
+  - native: partition-log
     external: partitionLog
     type: concept
-  - native: kafka#partition-log-composes-segment
+  - native: partition-log-composes-segment
     external: partitionLogComposesSegment
     type: relationship
-  - native: kafka#producer-app-composes-producer-client
+  - native: producer-app-composes-producer-client
     external: producerAppComposesProducerClient
     type: relationship
-  - native: kafka#producer-application
+  - native: producer-application
     external: producerApplication
     type: concept
-  - native: kafka#producer-client
+  - native: producer-client
     external: producerClient
     type: concept
-  - native: kafka#producer-sends-records
+  - native: producer-sends-records
     external: producerSendsRecords
     type: relationship
-  - native: kafka#publisher-updates-cache
+  - native: publisher-updates-cache
     external: publisherUpdatesCache
     type: relationship
-  - native: kafka#quorum-aggregates-controller
+  - native: quorum-aggregates-controller
     external: quorumAggregatesController
     type: relationship
-  - native: kafka#raft-consensus
+  - native: raft-consensus
     external: raftConsensus
     type: concept
-  - native: kafka#raft-replicates-metadata-log
+  - native: raft-replicates-metadata-log
     external: raftReplicatesMetadataLog
     type: relationship
-  - native: kafka#record
+  - native: record
     external: record
     type: concept
-  - native: kafka#replica-fetcher
+  - native: replica-fetcher
     external: replicaFetcher
     type: concept
-  - native: kafka#replica-manager
+  - native: replica-manager
     external: replicaManager
     type: concept
-  - native: kafka#replica-manager-alterpartition
+  - native: replica-manager-alterpartition
     external: replicaManagerAlterpartition
     type: relationship
-  - native: kafka#replica-manager-manages-hw
+  - native: replica-manager-manages-hw
     external: replicaManagerManagesHw
     type: relationship
-  - native: kafka#replica-manager-manages-isr
+  - native: replica-manager-manages-isr
     external: replicaManagerManagesIsr
     type: relationship
-  - native: kafka#replica-manager-manages-replicas
+  - native: replica-manager-manages-replicas
     external: replicaManagerManagesReplicas
     type: relationship
-  - native: kafka#topic
+  - native: topic
     external: topic
     type: concept
-  - native: kafka#topic-composes-partition
+  - native: topic-composes-partition
     external: topicComposesPartition
     type: relationship
-  - native: kafka#topic-partition
+  - native: topic-partition
     external: topicPartition
     type: concept

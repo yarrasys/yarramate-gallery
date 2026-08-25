@@ -3,7 +3,7 @@ model {
   broker = applicationComponent 'Broker' {
     description 'KRaft broker node (BrokerServer). It serves produce and fetch requests, hosts partition replicas, and runs a group coordinator. A node may combine the broker and controller roles in one process (process.roles=broker,controller).'
     metadata {
-      yarramateId 'kafka#broker'
+      yarramateId 'broker'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -11,7 +11,7 @@ model {
   clusterMetadataCache = artifact 'Cluster metadata cache' {
     description 'KRaftMetadataCache: each node\'s in-memory MetadataImage of the committed cluster metadata, swapped wholesale on every update (metadata/KRaftMetadataCache.java).'
     metadata {
-      yarramateId 'kafka#cluster-metadata-cache'
+      yarramateId 'cluster-metadata-cache'
       yarramateKind 'yarramate/core@0.1#artifact'
       status 'current'
     }
@@ -19,7 +19,7 @@ model {
   consumerApplication = businessActor 'Consumer application' {
     description 'Application that subscribes to topics and consumes records as a member of a consumer group. The repository ships a KafkaConsumer client library for it; the actor itself is an interpretation.'
     metadata {
-      yarramateId 'kafka#consumer-application'
+      yarramateId 'consumer-application'
       yarramateKind 'yarramate/core@0.1#businessActor'
       status 'current'
     }
@@ -27,7 +27,7 @@ model {
   consumerClient = applicationComponent 'Consumer client' {
     description 'KafkaConsumer, a facade over a ConsumerDelegate. The classic delegate uses a ConsumerCoordinator to join groups and a Fetcher to pull records from partition leaders (clients/consumer).'
     metadata {
-      yarramateId 'kafka#consumer-client'
+      yarramateId 'consumer-client'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -35,7 +35,7 @@ model {
   consumerGroup = dataObject 'Consumer group' {
     description 'A consumer group: members collectively consume a set of topics, each partition assigned to exactly one member, sharing committed offsets.'
     metadata {
-      yarramateId 'kafka#consumer-group'
+      yarramateId 'consumer-group'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -43,7 +43,7 @@ model {
   consumerOffsets = dataObject 'Committed offsets' {
     description '__consumer_offsets: the compacted internal topic storing committed consumer offsets and group metadata, written by the group coordinator (common/internals/Topic.java; OffsetMetadataManager).'
     metadata {
-      yarramateId 'kafka#consumer-offsets'
+      yarramateId 'consumer-offsets'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -51,7 +51,7 @@ model {
   controller = applicationComponent 'Controller' {
     description 'KRaft controller node (ControllerServer hosting a QuorumController). The Raft leader of the metadata log is the single active controller that manages cluster metadata; all other controllers stand by.'
     metadata {
-      yarramateId 'kafka#controller'
+      yarramateId 'controller'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -59,7 +59,7 @@ model {
   controllerQuorum = applicationComponent 'Controller quorum' {
     description 'The configured controller voters that form the KRaft quorum. They elect the active controller and replicate the metadata log among themselves.'
     metadata {
-      yarramateId 'kafka#controller-quorum'
+      yarramateId 'controller-quorum'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -67,7 +67,7 @@ model {
   groupCoordinator = applicationComponent 'Group coordinator' {
     description 'GroupCoordinatorService running on a broker. It manages consumer groups, assignment, and committed offsets, persisting them to the __consumer_offsets topic (group-coordinator module).'
     metadata {
-      yarramateId 'kafka#group-coordinator'
+      yarramateId 'group-coordinator'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -75,7 +75,7 @@ model {
   highWatermark = dataObject 'High watermark' {
     description 'The highest offset replicated to all ISR replicas. It is monotonic and bounds the offsets visible to consumers (UnifiedLog.highWatermarkMetadata).'
     metadata {
-      yarramateId 'kafka#high-watermark'
+      yarramateId 'high-watermark'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -83,7 +83,7 @@ model {
   inSyncReplicaSet = dataObject 'In-sync replica set' {
     description 'The ISR: the leader plus the follower replicas caught up within the configured lag bound. It gates acks=all durability and high-watermark advancement.'
     metadata {
-      yarramateId 'kafka#in-sync-replica-set'
+      yarramateId 'in-sync-replica-set'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -91,7 +91,7 @@ model {
   kafkaCluster = applicationComponent 'Kafka cluster' {
     description 'A set of Kafka nodes sharing a single replicated metadata log. KafkaRaftServer constructs each node from its process.roles; SharedServer owns the shared Raft manager and metadata loader.'
     metadata {
-      yarramateId 'kafka#kafka-cluster'
+      yarramateId 'kafka-cluster'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -99,7 +99,7 @@ model {
   logManager = applicationComponent 'Log manager' {
     description 'LogManager (kafka.log) responsible for creating, loading, and retaining the on-disk partition logs across the configured log directories.'
     metadata {
-      yarramateId 'kafka#log-manager'
+      yarramateId 'log-manager'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -107,7 +107,7 @@ model {
   logSegment = artifact 'Log segment' {
     description 'LogSegment: a rollable log file with an offset index and a time index. Segments compose a partition log and are rolled by size or time (storage/log/LogSegment.java).'
     metadata {
-      yarramateId 'kafka#log-segment'
+      yarramateId 'log-segment'
       yarramateKind 'yarramate/core@0.1#artifact'
       status 'current'
     }
@@ -115,7 +115,7 @@ model {
   metadataLog = artifact 'Metadata log' {
     description '__cluster_metadata partition 0: the single internal topic that stores all cluster metadata (topics, partitions, broker registrations, configs) and is replicated by Raft (common/internals/Topic.java; KafkaRaftLog).'
     metadata {
-      yarramateId 'kafka#metadata-log'
+      yarramateId 'metadata-log'
       yarramateKind 'yarramate/core@0.1#artifact'
       status 'current'
     }
@@ -123,7 +123,7 @@ model {
   metadataPublisher = applicationComponent 'Metadata publisher' {
     description 'MetadataLoader with its MetadataPublisher implementations (notably BrokerMetadataPublisher). It turns committed metadata batches into a MetadataImage and publishes it to each node\'s in-memory cache and runtime.'
     metadata {
-      yarramateId 'kafka#metadata-publisher'
+      yarramateId 'metadata-publisher'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -131,7 +131,7 @@ model {
   partitionAssignor = applicationComponent 'Partition assignor' {
     description 'Client-side partition assignor run by the group-leader consumer to map partitions to members. The cooperative-sticky assignor is the default (CooperativeStickyAssignor), with eager sticky, range, and round-robin alternatives in the same package.'
     metadata {
-      yarramateId 'kafka#partition-assignor'
+      yarramateId 'partition-assignor'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -139,7 +139,7 @@ model {
   partitionLog = artifact 'Partition log' {
     description 'UnifiedLog: the append-only, offset-indexed log for one partition replica on disk. Appends as leader assign offsets; appends as follower replicate them (storage/log/UnifiedLog.java).'
     metadata {
-      yarramateId 'kafka#partition-log'
+      yarramateId 'partition-log'
       yarramateKind 'yarramate/core@0.1#artifact'
       status 'current'
     }
@@ -147,7 +147,7 @@ model {
   producerApplication = businessActor 'Producer application' {
     description 'Application that publishes records to Kafka topics. The repository ships a KafkaProducer client library for it; the actor itself is an interpretation.'
     metadata {
-      yarramateId 'kafka#producer-application'
+      yarramateId 'producer-application'
       yarramateKind 'yarramate/core@0.1#businessActor'
       status 'current'
     }
@@ -155,7 +155,7 @@ model {
   producerClient = applicationComponent 'Producer client' {
     description 'KafkaProducer with its RecordAccumulator and background Sender thread (clients/producer). It batches records per partition and sends Produce requests to partition leaders; the acks setting controls durability.'
     metadata {
-      yarramateId 'kafka#producer-client'
+      yarramateId 'producer-client'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -163,7 +163,7 @@ model {
   raftConsensus = applicationComponent 'Raft consensus engine' {
     description 'KafkaRaftClient, the Raft implementation over the metadata log. Leader election is pure Raft; log replication is follower-pull (raft module).'
     metadata {
-      yarramateId 'kafka#raft-consensus'
+      yarramateId 'raft-consensus'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -171,7 +171,7 @@ model {
   record = dataObject 'Record' {
     description 'A Kafka record (key, value, timestamp, headers) produced and consumed as batches of MemoryRecords.'
     metadata {
-      yarramateId 'kafka#record'
+      yarramateId 'record'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -179,7 +179,7 @@ model {
   replicaFetcher = applicationComponent 'Replica fetcher' {
     description 'ReplicaFetcherThread/Manager on a follower broker. It fetches records from the leader, appends them to the local replica, and advances the follower\'s high watermark (core/server/ReplicaFetcherThread.scala).'
     metadata {
-      yarramateId 'kafka#replica-fetcher'
+      yarramateId 'replica-fetcher'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -187,7 +187,7 @@ model {
   replicaManager = applicationComponent 'Replica manager' {
     description 'ReplicaManager on a broker. It manages the hosted partition replicas, appends records, serves fetches, shrinks and expands the ISR, and advances the high watermark (core/server/ReplicaManager.scala).'
     metadata {
-      yarramateId 'kafka#replica-manager'
+      yarramateId 'replica-manager'
       yarramateKind 'yarramate/core@0.1#applicationComponent'
       status 'current'
     }
@@ -195,7 +195,7 @@ model {
   topic = dataObject 'Topic' {
     description 'A Kafka topic: a logical, ordered stream of records partitioned for parallelism and replication across brokers.'
     metadata {
-      yarramateId 'kafka#topic'
+      yarramateId 'topic'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
@@ -203,24 +203,24 @@ model {
   topicPartition = dataObject 'Partition' {
     description 'A partition: the unit of replication. It has one leader replica and zero or more follower replicas; leader, replicas, and ISR are recorded as a PartitionRegistration in the metadata log (core/cluster/Partition.scala).'
     metadata {
-      yarramateId 'kafka#topic-partition'
+      yarramateId 'topic-partition'
       yarramateKind 'yarramate/core@0.1#dataObject'
       status 'current'
     }
   }
 
-  partitionAssignor -[flow]-> consumerGroup {
+  partitionAssignor -[access]-> consumerGroup {
     description 'The group-leader consumer runs the assignor to map partitions to members.'
     metadata {
-      yarramateId 'kafka#assignor-computes-assignment'
-      yarramateKind 'yarramate/core@0.1#flow'
-      content 'Partition assignment'
+      yarramateId 'assignor-computes-assignment'
+      yarramateKind 'yarramate/core@0.1#access'
+      mode 'write'
     }
   }
   partitionAssignor -[access]-> topicPartition {
     description 'The assignor reads the subscribed partitions to distribute them across group members.'
     metadata {
-      yarramateId 'kafka#assignor-reads-partitions'
+      yarramateId 'assignor-reads-partitions'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read'
     }
@@ -228,54 +228,54 @@ model {
   broker -[flow]-> producerClient {
     description 'With acks=all the leader waits until the record is replicated to the whole ISR before acknowledging the producer.'
     metadata {
-      yarramateId 'kafka#broker-acks-producer'
+      yarramateId 'broker-acks-producer'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Produce acknowledgement'
     }
   }
-  broker -[flow]-> partitionLog {
+  broker -[access]-> partitionLog {
     description 'handleProduceRequest routes to ReplicaManager, which appends to the leader\'s UnifiedLog via appendAsLeader.'
     metadata {
-      yarramateId 'kafka#broker-appends-log'
-      yarramateKind 'yarramate/core@0.1#flow'
-      content 'Records appended as leader'
+      yarramateId 'broker-appends-log'
+      yarramateKind 'yarramate/core@0.1#access'
+      mode 'write'
     }
   }
   broker -[composition]-> groupCoordinator {
     metadata {
-      yarramateId 'kafka#broker-composes-group-coordinator'
+      yarramateId 'broker-composes-group-coordinator'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
   broker -[composition]-> logManager {
     metadata {
-      yarramateId 'kafka#broker-composes-log-manager'
+      yarramateId 'broker-composes-log-manager'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
-  broker -[composition]-> clusterMetadataCache {
+  broker -[association]-> clusterMetadataCache {
     metadata {
-      yarramateId 'kafka#broker-composes-metadata-cache'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'broker-composes-metadata-cache'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
   broker -[composition]-> replicaFetcher {
     description 'A broker hosts replica fetcher threads for partitions where it acts as a follower.'
     metadata {
-      yarramateId 'kafka#broker-composes-replica-fetcher'
+      yarramateId 'broker-composes-replica-fetcher'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
   broker -[composition]-> replicaManager {
     metadata {
-      yarramateId 'kafka#broker-composes-replica-manager'
+      yarramateId 'broker-composes-replica-manager'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
   broker -[access]-> topicPartition {
     description 'A broker hosts replicas of partitions, acting as leader or follower.'
     metadata {
-      yarramateId 'kafka#broker-manages-partition'
+      yarramateId 'broker-manages-partition'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -283,7 +283,7 @@ model {
   broker -[access]-> clusterMetadataCache {
     description 'The broker reads leader and ISR placement from its metadata cache to route requests.'
     metadata {
-      yarramateId 'kafka#broker-reads-metadata-cache'
+      yarramateId 'broker-reads-metadata-cache'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read'
     }
@@ -291,45 +291,45 @@ model {
   broker -[flow]-> replicaFetcher {
     description 'The leader broker serves fetch requests from follower brokers\' replica fetcher threads.'
     metadata {
-      yarramateId 'kafka#broker-replicates-followers'
+      yarramateId 'broker-replicates-followers'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Replicated records (leader to follower replicas within the ISR)'
     }
   }
   kafkaCluster -[composition]-> broker {
     metadata {
-      yarramateId 'kafka#cluster-composes-broker'
+      yarramateId 'cluster-composes-broker'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
   kafkaCluster -[composition]-> controllerQuorum {
     metadata {
-      yarramateId 'kafka#cluster-composes-controller-quorum'
+      yarramateId 'cluster-composes-controller-quorum'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
-  kafkaCluster -[composition]-> metadataLog {
+  kafkaCluster -[association]-> metadataLog {
     metadata {
-      yarramateId 'kafka#cluster-composes-metadata-log'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'cluster-composes-metadata-log'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
-  consumerApplication -[composition]-> partitionAssignor {
+  consumerApplication -[association]-> partitionAssignor {
     metadata {
-      yarramateId 'kafka#consumer-app-composes-assignor'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'consumer-app-composes-assignor'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
-  consumerApplication -[composition]-> consumerClient {
+  consumerApplication -[association]-> consumerClient {
     metadata {
-      yarramateId 'kafka#consumer-app-composes-consumer-client'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'consumer-app-composes-consumer-client'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
   consumerClient -[flow]-> groupCoordinator {
     description 'The consumer commits offsets (sync or async) to its group coordinator.'
     metadata {
-      yarramateId 'kafka#consumer-commits-offsets'
+      yarramateId 'consumer-commits-offsets'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Offset commit'
     }
@@ -337,7 +337,7 @@ model {
   consumerClient -[flow]-> broker {
     description 'The consumer\'s Fetcher issues Fetch requests to partition leaders and returns the collected records.'
     metadata {
-      yarramateId 'kafka#consumer-fetches-records'
+      yarramateId 'consumer-fetches-records'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Fetch request (poll)'
     }
@@ -345,27 +345,27 @@ model {
   consumerClient -[flow]-> groupCoordinator {
     description 'The consumer\'s coordinator joins (or rejoins) the group and heartbeats to stay alive.'
     metadata {
-      yarramateId 'kafka#consumer-joins-group'
+      yarramateId 'consumer-joins-group'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Join group and heartbeat'
     }
   }
-  controller -[composition]-> clusterMetadataCache {
+  controller -[association]-> clusterMetadataCache {
     metadata {
-      yarramateId 'kafka#controller-composes-metadata-cache'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'controller-composes-metadata-cache'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
   controller -[composition]-> raftConsensus {
     metadata {
-      yarramateId 'kafka#controller-composes-raft'
+      yarramateId 'controller-composes-raft'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
   controller -[access]-> topicPartition {
     description 'The controller sets partition leader, replicas, and ISR via PartitionRegistration records in the metadata log.'
     metadata {
-      yarramateId 'kafka#controller-manages-partitions'
+      yarramateId 'controller-manages-partitions'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -373,7 +373,7 @@ model {
   controller -[access]-> metadataLog {
     description 'The active controller appends metadata records (the Raft leader writes first).'
     metadata {
-      yarramateId 'kafka#controller-writes-metadata-log'
+      yarramateId 'controller-writes-metadata-log'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -381,7 +381,7 @@ model {
   groupCoordinator -[flow]-> consumerClient {
     description 'The coordinator delivers each member\'s assignment through the sync/heartbeat response.'
     metadata {
-      yarramateId 'kafka#coordinator-delivers-assignment'
+      yarramateId 'coordinator-delivers-assignment'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Partition assignment'
     }
@@ -389,7 +389,7 @@ model {
   groupCoordinator -[access]-> consumerGroup {
     description 'The group coordinator owns consumer-group membership and assignment state.'
     metadata {
-      yarramateId 'kafka#coordinator-manages-group'
+      yarramateId 'coordinator-manages-group'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -397,79 +397,78 @@ model {
   groupCoordinator -[access]-> consumerOffsets {
     description 'The group coordinator commits and reads offsets in the __consumer_offsets topic.'
     metadata {
-      yarramateId 'kafka#coordinator-manages-offsets'
+      yarramateId 'coordinator-manages-offsets'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
   }
-  consumerGroup -[aggregation]-> consumerClient {
-    description 'A consumer group aggregates its consumer members.'
+  consumerGroup -[association]-> consumerClient {
+    description 'Group state names the consumer members it was computed for.'
     metadata {
-      yarramateId 'kafka#group-aggregates-consumer'
-      yarramateKind 'yarramate/core@0.1#aggregation'
+      yarramateId 'group-aggregates-consumer'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
-  partitionLog -[flow]-> logSegment {
+  partitionLog -[association]-> logSegment {
     description 'UnifiedLog.append writes to the active LogSegment, assigning offsets and updating the offset/time indexes.'
     metadata {
-      yarramateId 'kafka#log-appends-segment'
-      yarramateKind 'yarramate/core@0.1#flow'
-      content 'Records appended to the active segment'
+      yarramateId 'log-appends-segment'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
-  logManager -[composition]-> partitionLog {
+  logManager -[association]-> partitionLog {
     metadata {
-      yarramateId 'kafka#log-manager-composes-partition-log'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'log-manager-composes-partition-log'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
-  metadataLog -[flow]-> metadataPublisher {
-    description 'The Raft client feeds committed batches to the MetadataLoader (a Raft listener).'
+  metadataPublisher -[access]-> metadataLog {
+    description 'The MetadataLoader, a Raft listener, reads committed batches from the metadata log.'
     metadata {
-      yarramateId 'kafka#metadata-log-to-publisher'
-      yarramateKind 'yarramate/core@0.1#flow'
-      content 'Committed metadata batches'
+      yarramateId 'metadata-log-to-publisher'
+      yarramateKind 'yarramate/core@0.1#access'
+      mode 'read'
     }
   }
   partitionLog -[composition]-> logSegment {
     metadata {
-      yarramateId 'kafka#partition-log-composes-segment'
+      yarramateId 'partition-log-composes-segment'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
-  producerApplication -[composition]-> producerClient {
+  producerApplication -[association]-> producerClient {
     metadata {
-      yarramateId 'kafka#producer-app-composes-producer-client'
-      yarramateKind 'yarramate/core@0.1#composition'
+      yarramateId 'producer-app-composes-producer-client'
+      yarramateKind 'yarramate/core@0.1#association'
     }
   }
   producerClient -[flow]-> broker {
     description 'The Sender builds a ProduceRequest with the configured acks and sends ready batches to the partition leader.'
     metadata {
-      yarramateId 'kafka#producer-sends-records'
+      yarramateId 'producer-sends-records'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'Produce request (batched producer records)'
     }
   }
-  metadataPublisher -[flow]-> clusterMetadataCache {
+  metadataPublisher -[access]-> clusterMetadataCache {
     description 'BrokerMetadataPublisher calls metadataCache.setImage with each new MetadataImage.'
     metadata {
-      yarramateId 'kafka#publisher-updates-cache'
-      yarramateKind 'yarramate/core@0.1#flow'
-      content 'New metadata image'
+      yarramateId 'publisher-updates-cache'
+      yarramateKind 'yarramate/core@0.1#access'
+      mode 'write'
     }
   }
   controllerQuorum -[aggregation]-> controller {
     description 'The controller quorum is the set of controller voters that elect the active controller.'
     metadata {
-      yarramateId 'kafka#quorum-aggregates-controller'
+      yarramateId 'quorum-aggregates-controller'
       yarramateKind 'yarramate/core@0.1#aggregation'
     }
   }
   raftConsensus -[access]-> metadataLog {
     description 'The Raft engine appends to and replicates the metadata log.'
     metadata {
-      yarramateId 'kafka#raft-replicates-metadata-log'
+      yarramateId 'raft-replicates-metadata-log'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -477,7 +476,7 @@ model {
   replicaManager -[flow]-> controller {
     description 'The broker sends ISR changes to the controller, which commits the new ISR to the metadata log.'
     metadata {
-      yarramateId 'kafka#replica-manager-alterpartition'
+      yarramateId 'replica-manager-alterpartition'
       yarramateKind 'yarramate/core@0.1#flow'
       content 'AlterPartition ISR change requests'
     }
@@ -485,7 +484,7 @@ model {
   replicaManager -[access]-> highWatermark {
     description 'ReplicaManager advances the high watermark to the minimum log-end offset across the ISR.'
     metadata {
-      yarramateId 'kafka#replica-manager-manages-hw'
+      yarramateId 'replica-manager-manages-hw'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -493,7 +492,7 @@ model {
   replicaManager -[access]-> inSyncReplicaSet {
     description 'ReplicaManager periodically shrinks the ISR and expands it as followers catch up.'
     metadata {
-      yarramateId 'kafka#replica-manager-manages-isr'
+      yarramateId 'replica-manager-manages-isr'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
@@ -501,14 +500,14 @@ model {
   replicaManager -[access]-> topicPartition {
     description 'ReplicaManager holds the hosted partitions and drives append, fetch, and leader/follower transitions.'
     metadata {
-      yarramateId 'kafka#replica-manager-manages-replicas'
+      yarramateId 'replica-manager-manages-replicas'
       yarramateKind 'yarramate/core@0.1#access'
       mode 'read-write'
     }
   }
   topic -[composition]-> topicPartition {
     metadata {
-      yarramateId 'kafka#topic-composes-partition'
+      yarramateId 'topic-composes-partition'
       yarramateKind 'yarramate/core@0.1#composition'
     }
   }
@@ -520,48 +519,48 @@ views {
     description 'Repository orientation: the Kafka cluster (KRaft), its broker and controller nodes, the client libraries, the topic/partition/replication model, on-disk log storage, the metadata log, and consumer-group state — all 26 concepts.'
     include broker, clusterMetadataCache, consumerApplication, consumerClient, consumerGroup, consumerOffsets, controller, controllerQuorum, groupCoordinator, highWatermark, inSyncReplicaSet, kafkaCluster, logManager, logSegment, metadataLog, metadataPublisher, partitionAssignor, partitionLog, producerApplication, producerClient, raftConsensus, record, replicaFetcher, replicaManager, topic, topicPartition
     exclude * -> *
-    include * -> * where metadata.yarramateId is 'kafka#assignor-computes-assignment'
-    include * -> * where metadata.yarramateId is 'kafka#assignor-reads-partitions'
-    include * -> * where metadata.yarramateId is 'kafka#broker-acks-producer'
-    include * -> * where metadata.yarramateId is 'kafka#broker-appends-log'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-group-coordinator'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-log-manager'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-replica-fetcher'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-replica-manager'
-    include * -> * where metadata.yarramateId is 'kafka#broker-manages-partition'
-    include * -> * where metadata.yarramateId is 'kafka#broker-reads-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#broker-replicates-followers'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-broker'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-controller-quorum'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-metadata-log'
-    include * -> * where metadata.yarramateId is 'kafka#consumer-app-composes-assignor'
-    include * -> * where metadata.yarramateId is 'kafka#consumer-app-composes-consumer-client'
-    include * -> * where metadata.yarramateId is 'kafka#consumer-commits-offsets'
-    include * -> * where metadata.yarramateId is 'kafka#consumer-fetches-records'
-    include * -> * where metadata.yarramateId is 'kafka#consumer-joins-group'
-    include * -> * where metadata.yarramateId is 'kafka#controller-composes-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#controller-composes-raft'
-    include * -> * where metadata.yarramateId is 'kafka#controller-manages-partitions'
-    include * -> * where metadata.yarramateId is 'kafka#controller-writes-metadata-log'
-    include * -> * where metadata.yarramateId is 'kafka#coordinator-delivers-assignment'
-    include * -> * where metadata.yarramateId is 'kafka#coordinator-manages-group'
-    include * -> * where metadata.yarramateId is 'kafka#coordinator-manages-offsets'
-    include * -> * where metadata.yarramateId is 'kafka#group-aggregates-consumer'
-    include * -> * where metadata.yarramateId is 'kafka#log-appends-segment'
-    include * -> * where metadata.yarramateId is 'kafka#log-manager-composes-partition-log'
-    include * -> * where metadata.yarramateId is 'kafka#metadata-log-to-publisher'
-    include * -> * where metadata.yarramateId is 'kafka#partition-log-composes-segment'
-    include * -> * where metadata.yarramateId is 'kafka#producer-app-composes-producer-client'
-    include * -> * where metadata.yarramateId is 'kafka#producer-sends-records'
-    include * -> * where metadata.yarramateId is 'kafka#publisher-updates-cache'
-    include * -> * where metadata.yarramateId is 'kafka#quorum-aggregates-controller'
-    include * -> * where metadata.yarramateId is 'kafka#raft-replicates-metadata-log'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-alterpartition'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-hw'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-isr'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-replicas'
-    include * -> * where metadata.yarramateId is 'kafka#topic-composes-partition'
+    include * -> * where metadata.yarramateId is 'assignor-computes-assignment'
+    include * -> * where metadata.yarramateId is 'assignor-reads-partitions'
+    include * -> * where metadata.yarramateId is 'broker-acks-producer'
+    include * -> * where metadata.yarramateId is 'broker-appends-log'
+    include * -> * where metadata.yarramateId is 'broker-composes-group-coordinator'
+    include * -> * where metadata.yarramateId is 'broker-composes-log-manager'
+    include * -> * where metadata.yarramateId is 'broker-composes-metadata-cache'
+    include * -> * where metadata.yarramateId is 'broker-composes-replica-fetcher'
+    include * -> * where metadata.yarramateId is 'broker-composes-replica-manager'
+    include * -> * where metadata.yarramateId is 'broker-manages-partition'
+    include * -> * where metadata.yarramateId is 'broker-reads-metadata-cache'
+    include * -> * where metadata.yarramateId is 'broker-replicates-followers'
+    include * -> * where metadata.yarramateId is 'cluster-composes-broker'
+    include * -> * where metadata.yarramateId is 'cluster-composes-controller-quorum'
+    include * -> * where metadata.yarramateId is 'cluster-composes-metadata-log'
+    include * -> * where metadata.yarramateId is 'consumer-app-composes-assignor'
+    include * -> * where metadata.yarramateId is 'consumer-app-composes-consumer-client'
+    include * -> * where metadata.yarramateId is 'consumer-commits-offsets'
+    include * -> * where metadata.yarramateId is 'consumer-fetches-records'
+    include * -> * where metadata.yarramateId is 'consumer-joins-group'
+    include * -> * where metadata.yarramateId is 'controller-composes-metadata-cache'
+    include * -> * where metadata.yarramateId is 'controller-composes-raft'
+    include * -> * where metadata.yarramateId is 'controller-manages-partitions'
+    include * -> * where metadata.yarramateId is 'controller-writes-metadata-log'
+    include * -> * where metadata.yarramateId is 'coordinator-delivers-assignment'
+    include * -> * where metadata.yarramateId is 'coordinator-manages-group'
+    include * -> * where metadata.yarramateId is 'coordinator-manages-offsets'
+    include * -> * where metadata.yarramateId is 'group-aggregates-consumer'
+    include * -> * where metadata.yarramateId is 'log-appends-segment'
+    include * -> * where metadata.yarramateId is 'log-manager-composes-partition-log'
+    include * -> * where metadata.yarramateId is 'metadata-log-to-publisher'
+    include * -> * where metadata.yarramateId is 'partition-log-composes-segment'
+    include * -> * where metadata.yarramateId is 'producer-app-composes-producer-client'
+    include * -> * where metadata.yarramateId is 'producer-sends-records'
+    include * -> * where metadata.yarramateId is 'publisher-updates-cache'
+    include * -> * where metadata.yarramateId is 'quorum-aggregates-controller'
+    include * -> * where metadata.yarramateId is 'raft-replicates-metadata-log'
+    include * -> * where metadata.yarramateId is 'replica-manager-alterpartition'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-hw'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-isr'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-replicas'
+    include * -> * where metadata.yarramateId is 'topic-composes-partition'
     autoLayout LeftRight
   }
   view replication-and-storage {
@@ -569,19 +568,19 @@ views {
     description 'The data plane: how a broker hosts partition replicas, appends records to a segment-based append-only log, replicates to followers within the ISR, and advances the high watermark.'
     include broker, highWatermark, inSyncReplicaSet, logManager, logSegment, partitionLog, record, replicaFetcher, replicaManager, topic, topicPartition
     exclude * -> *
-    include * -> * where metadata.yarramateId is 'kafka#broker-appends-log'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-log-manager'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-replica-fetcher'
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-replica-manager'
-    include * -> * where metadata.yarramateId is 'kafka#broker-manages-partition'
-    include * -> * where metadata.yarramateId is 'kafka#broker-replicates-followers'
-    include * -> * where metadata.yarramateId is 'kafka#log-appends-segment'
-    include * -> * where metadata.yarramateId is 'kafka#log-manager-composes-partition-log'
-    include * -> * where metadata.yarramateId is 'kafka#partition-log-composes-segment'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-hw'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-isr'
-    include * -> * where metadata.yarramateId is 'kafka#replica-manager-manages-replicas'
-    include * -> * where metadata.yarramateId is 'kafka#topic-composes-partition'
+    include * -> * where metadata.yarramateId is 'broker-appends-log'
+    include * -> * where metadata.yarramateId is 'broker-composes-log-manager'
+    include * -> * where metadata.yarramateId is 'broker-composes-replica-fetcher'
+    include * -> * where metadata.yarramateId is 'broker-composes-replica-manager'
+    include * -> * where metadata.yarramateId is 'broker-manages-partition'
+    include * -> * where metadata.yarramateId is 'broker-replicates-followers'
+    include * -> * where metadata.yarramateId is 'log-appends-segment'
+    include * -> * where metadata.yarramateId is 'log-manager-composes-partition-log'
+    include * -> * where metadata.yarramateId is 'partition-log-composes-segment'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-hw'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-isr'
+    include * -> * where metadata.yarramateId is 'replica-manager-manages-replicas'
+    include * -> * where metadata.yarramateId is 'topic-composes-partition'
     autoLayout LeftRight
   }
   view metadata-plane {
@@ -589,20 +588,20 @@ views {
     description 'The control plane: the controller quorum runs Raft consensus over the single __cluster_metadata log; committed records become a metadata image published to every node\'s in-memory cache.'
     include broker, clusterMetadataCache, controller, controllerQuorum, kafkaCluster, metadataLog, metadataPublisher, raftConsensus, topicPartition
     exclude * -> *
-    include * -> * where metadata.yarramateId is 'kafka#broker-composes-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#broker-manages-partition'
-    include * -> * where metadata.yarramateId is 'kafka#broker-reads-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-broker'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-controller-quorum'
-    include * -> * where metadata.yarramateId is 'kafka#cluster-composes-metadata-log'
-    include * -> * where metadata.yarramateId is 'kafka#controller-composes-metadata-cache'
-    include * -> * where metadata.yarramateId is 'kafka#controller-composes-raft'
-    include * -> * where metadata.yarramateId is 'kafka#controller-manages-partitions'
-    include * -> * where metadata.yarramateId is 'kafka#controller-writes-metadata-log'
-    include * -> * where metadata.yarramateId is 'kafka#metadata-log-to-publisher'
-    include * -> * where metadata.yarramateId is 'kafka#publisher-updates-cache'
-    include * -> * where metadata.yarramateId is 'kafka#quorum-aggregates-controller'
-    include * -> * where metadata.yarramateId is 'kafka#raft-replicates-metadata-log'
+    include * -> * where metadata.yarramateId is 'broker-composes-metadata-cache'
+    include * -> * where metadata.yarramateId is 'broker-manages-partition'
+    include * -> * where metadata.yarramateId is 'broker-reads-metadata-cache'
+    include * -> * where metadata.yarramateId is 'cluster-composes-broker'
+    include * -> * where metadata.yarramateId is 'cluster-composes-controller-quorum'
+    include * -> * where metadata.yarramateId is 'cluster-composes-metadata-log'
+    include * -> * where metadata.yarramateId is 'controller-composes-metadata-cache'
+    include * -> * where metadata.yarramateId is 'controller-composes-raft'
+    include * -> * where metadata.yarramateId is 'controller-manages-partitions'
+    include * -> * where metadata.yarramateId is 'controller-writes-metadata-log'
+    include * -> * where metadata.yarramateId is 'metadata-log-to-publisher'
+    include * -> * where metadata.yarramateId is 'publisher-updates-cache'
+    include * -> * where metadata.yarramateId is 'quorum-aggregates-controller'
+    include * -> * where metadata.yarramateId is 'raft-replicates-metadata-log'
     autoLayout LeftRight
   }
   dynamic view produce-path {

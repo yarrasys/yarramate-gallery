@@ -237,8 +237,52 @@ might take up later:
 - Whether Kafka Connect / Streams should be added as first-class subsystems
   (out of scope for this streaming-core model).
 
+## Migration to yarramate 1.0.0 (2026-08-25)
+
+The model was authored under 0.15.0 and migrated to 1.0.0. **No fact about
+Kafka changed.** Two mechanical classes of change were needed, both re-checked
+against the pinned commit `26b251a4`:
+
+**1. Flat subject ids.** [yarramate#223](https://github.com/yarrasys/yarramate/issues/223)
+made subject ids flat and workspace-unique, so the `kafka#` document prefix was
+stripped from every reference in projections, evidence, the LikeC4 subject
+mapping, and the LikeC4 project (211 references). Concept and relationship ids
+were already flat and did not move.
+
+**2. ArchiMate 3.2 relationship table conformance.** yarramate
+[ADR 0097](https://github.com/yarrasys/yarramate/blob/main/docs/adr/0097-relationship-endpoints-are-validated-against-the-archimate-relationship-table.md)
+replaced four broad aspect rules with the full ArchiMate 3.2 relationship
+table. Thirteen relationships in this model used shapes the table forbids. The
+model checked clean under 0.22.0 and reported these thirteen under 1.0.0. Each
+was a folded field or a direction error, exactly the class ADR 0097 describes,
+and each was repaired through `yarramate apply` rather than by hand:
+
+| Was | Became | Relationships | Why |
+| --- | --- | --- | --- |
+| `composition` component → artifact | `association` | `cluster-composes-metadata-log`, `broker-composes-metadata-cache`, `controller-composes-metadata-cache`, `log-manager-composes-partition-log` | An application component cannot compose a technology artifact. The behavioural claims were already carried by the existing `access` edges (`controller-writes-metadata-log`, `broker-reads-metadata-cache`), so restating them would have duplicated the claim. What remains is structural association. |
+| `composition` business actor → component | `association` | `producer-app-composes-producer-client`, `consumer-app-composes-consumer-client`, `consumer-app-composes-assignor` | A business actor cannot compose an application component. The application embeds the client library; association is the claim that survives without inventing a serving direction the evidence does not attest. |
+| `aggregation` data object → component | `association` | `group-aggregates-consumer` | Group state cannot aggregate its members. Re-kinding the consumer group to an `applicationCollaboration` would make the aggregation legal but would break `coordinator-manages-group`, since active-structure elements cannot be accessed. |
+| `flow` into a passive element | `access` | `broker-appends-log` (write), `assignor-computes-assignment` (write), `publisher-updates-cache` (write) | A flow whose endpoint is passive is an access. The folded field is the mode. |
+| `flow` artifact → component | `access` (read, reversed) | `metadata-log-to-publisher` | A direction error. The evidence records that `MetadataLoader.handleCommit` *consumes* committed batches, so the access runs from the publisher to the log. The description was rewritten to match; prose does not move with a direction change. |
+| `flow` artifact → artifact | `association` | `log-appends-segment` | Two passive elements cannot flow. The structural claim is already carried by `partition-log-composes-segment`, so what remains is association. |
+
+Re-validated after migration with `yarramate@1.0.0`:
+
+| Command | Outcome |
+| --- | --- |
+| `yarramate check .yarramate/workspace.yaml` | no errors (26 concepts / 42 relationships / 5 projections / 1 evidence document) |
+| `yarramate reconcile .yarramate/workspace.yaml` | 68 observations, 68 confirmed, 0 findings, 0 subjects without evidence |
+| `yarramate export likec4 …` | exit 0, regenerated; `diagrams/` re-rendered |
+
+Concept and relationship counts, and the reconciliation result, are unchanged
+from the 0.15.0 authoring. Every evidence locator still resolves.
+
+A richer re-model is possible and was deliberately not attempted: several of the
+`association` results above are the weakest legal claim rather than the most
+expressive one. Making them more expressive would mean re-kinding concepts and
+re-verifying against the source, which is new modelling work, not a migration.
+
 ## Status in Git
 
-This showcase is a proposed, uncommitted artifact: the model was authored
-directly in the gallery tree. No commits, pushes, branches, or issues were
-created (per instructions, no git operations were run in the gallery repo).
+The model was authored directly in the gallery tree and committed to this
+repository. The 1.0.0 migration above was applied in place on 2026-08-25.
