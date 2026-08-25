@@ -3,15 +3,15 @@ id: metadata-plane
 version: "1.0"
 query:
   subjects:
-    - kafka#kafka-cluster
-    - kafka#controller
-    - kafka#controller-quorum
-    - kafka#raft-consensus
-    - kafka#metadata-log
-    - kafka#metadata-publisher
-    - kafka#cluster-metadata-cache
-    - kafka#broker
-    - kafka#topic-partition
+    - kafka-cluster
+    - controller
+    - controller-quorum
+    - raft-consensus
+    - metadata-log
+    - metadata-publisher
+    - cluster-metadata-cache
+    - broker
+    - topic-partition
   relationships: between
 presentation:
   title: KRaft metadata plane

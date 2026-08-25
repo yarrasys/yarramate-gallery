@@ -223,7 +223,7 @@ relationships:
     from: kafka-cluster
     to: broker
   - id: cluster-composes-metadata-log
-    kind: composition
+    kind: association
     from: kafka-cluster
     to: metadata-log
   - id: broker-composes-replica-manager
@@ -239,7 +239,7 @@ relationships:
     from: broker
     to: group-coordinator
   - id: broker-composes-metadata-cache
-    kind: composition
+    kind: association
     from: broker
     to: cluster-metadata-cache
   - id: broker-composes-replica-fetcher
@@ -248,7 +248,7 @@ relationships:
     to: replica-fetcher
     description: A broker hosts replica fetcher threads for partitions where it acts as a follower.
   - id: log-manager-composes-partition-log
-    kind: composition
+    kind: association
     from: log-manager
     to: partition-log
   - id: partition-log-composes-segment
@@ -264,19 +264,19 @@ relationships:
     from: controller
     to: raft-consensus
   - id: controller-composes-metadata-cache
-    kind: composition
+    kind: association
     from: controller
     to: cluster-metadata-cache
   - id: producer-app-composes-producer-client
-    kind: composition
+    kind: association
     from: producer-application
     to: producer-client
   - id: consumer-app-composes-consumer-client
-    kind: composition
+    kind: association
     from: consumer-application
     to: consumer-client
   - id: consumer-app-composes-assignor
-    kind: composition
+    kind: association
     from: consumer-application
     to: partition-assignor
 
@@ -287,10 +287,10 @@ relationships:
     to: controller
     description: The controller quorum is the set of controller voters that elect the active controller.
   - id: group-aggregates-consumer
-    kind: aggregation
+    kind: association
     from: consumer-group
     to: consumer-client
-    description: A consumer group aggregates its consumer members.
+    description: Group state names the consumer members it was computed for.
 
   # --- Access: passive structures managed by active components ---
   - id: raft-replicates-metadata-log
@@ -368,16 +368,15 @@ relationships:
     content: Produce request (batched producer records)
     description: The Sender builds a ProduceRequest with the configured acks and sends ready batches to the partition leader.
   - id: broker-appends-log
-    kind: flow
+    kind: access
     from: broker
     to: partition-log
-    content: Records appended as leader
     description: handleProduceRequest routes to ReplicaManager, which appends to the leader's UnifiedLog via appendAsLeader.
+    mode: write
   - id: log-appends-segment
-    kind: flow
+    kind: association
     from: partition-log
     to: log-segment
-    content: Records appended to the active segment
     description: UnifiedLog.append writes to the active LogSegment, assigning offsets and updating the offset/time indexes.
   - id: broker-replicates-followers
     kind: flow
@@ -400,11 +399,11 @@ relationships:
     content: Join group and heartbeat
     description: The consumer's coordinator joins (or rejoins) the group and heartbeats to stay alive.
   - id: assignor-computes-assignment
-    kind: flow
+    kind: access
     from: partition-assignor
     to: consumer-group
-    content: Partition assignment
     description: The group-leader consumer runs the assignor to map partitions to members.
+    mode: write
   - id: coordinator-delivers-assignment
     kind: flow
     from: group-coordinator
@@ -426,17 +425,17 @@ relationships:
 
   # --- Metadata pipeline and ISR negotiation flow ---
   - id: metadata-log-to-publisher
-    kind: flow
-    from: metadata-log
-    to: metadata-publisher
-    content: Committed metadata batches
-    description: The Raft client feeds committed batches to the MetadataLoader (a Raft listener).
+    kind: access
+    from: metadata-publisher
+    to: metadata-log
+    description: The MetadataLoader, a Raft listener, reads committed batches from the metadata log.
+    mode: read
   - id: publisher-updates-cache
-    kind: flow
+    kind: access
     from: metadata-publisher
     to: cluster-metadata-cache
-    content: New metadata image
     description: BrokerMetadataPublisher calls metadataCache.setImage with each new MetadataImage.
+    mode: write
   - id: replica-manager-alterpartition
     kind: flow
     from: replica-manager

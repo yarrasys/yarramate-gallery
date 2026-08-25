@@ -3,32 +3,32 @@ id: system-overview
 version: "1.0"
 query:
   subjects:
-    - kafka#producer-application
-    - kafka#consumer-application
-    - kafka#producer-client
-    - kafka#consumer-client
-    - kafka#partition-assignor
-    - kafka#kafka-cluster
-    - kafka#broker
-    - kafka#controller
-    - kafka#controller-quorum
-    - kafka#raft-consensus
-    - kafka#replica-manager
-    - kafka#log-manager
-    - kafka#group-coordinator
-    - kafka#replica-fetcher
-    - kafka#metadata-publisher
-    - kafka#topic
-    - kafka#topic-partition
-    - kafka#in-sync-replica-set
-    - kafka#high-watermark
-    - kafka#record
-    - kafka#partition-log
-    - kafka#log-segment
-    - kafka#metadata-log
-    - kafka#cluster-metadata-cache
-    - kafka#consumer-group
-    - kafka#consumer-offsets
+    - producer-application
+    - consumer-application
+    - producer-client
+    - consumer-client
+    - partition-assignor
+    - kafka-cluster
+    - broker
+    - controller
+    - controller-quorum
+    - raft-consensus
+    - replica-manager
+    - log-manager
+    - group-coordinator
+    - replica-fetcher
+    - metadata-publisher
+    - topic
+    - topic-partition
+    - in-sync-replica-set
+    - high-watermark
+    - record
+    - partition-log
+    - log-segment
+    - metadata-log
+    - cluster-metadata-cache
+    - consumer-group
+    - consumer-offsets
   relationships: between
 presentation:
   title: Kafka system overview

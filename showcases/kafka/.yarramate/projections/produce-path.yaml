@@ -3,14 +3,14 @@ id: produce-path
 version: "1.0"
 query:
   subjects:
-    - kafka#producer-client
-    - kafka#broker
-    - kafka#partition-log
-    - kafka#log-segment
-    - kafka#replica-fetcher
-    - kafka#replica-manager
-    - kafka#in-sync-replica-set
-    - kafka#high-watermark
+    - producer-client
+    - broker
+    - partition-log
+    - log-segment
+    - replica-fetcher
+    - replica-manager
+    - in-sync-replica-set
+    - high-watermark
   relationships: between
 presentation:
   title: Produce path

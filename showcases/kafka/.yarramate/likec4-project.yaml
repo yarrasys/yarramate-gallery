@@ -11,20 +11,20 @@ views:
     projection: projections/produce-path.yaml
     dynamic:
       steps:
-        - relationship: kafka#producer-sends-records
-        - relationship: kafka#broker-appends-log
-        - relationship: kafka#log-appends-segment
-        - relationship: kafka#broker-replicates-followers
-        - relationship: kafka#replica-manager-manages-isr
-        - relationship: kafka#replica-manager-manages-hw
-        - relationship: kafka#broker-acks-producer
+        - relationship: producer-sends-records
+        - relationship: broker-appends-log
+        - relationship: log-appends-segment
+        - relationship: broker-replicates-followers
+        - relationship: replica-manager-manages-isr
+        - relationship: replica-manager-manages-hw
+        - relationship: broker-acks-producer
   - id: consumer-group-coordination
     projection: projections/consumer-group-coordination.yaml
     dynamic:
       steps:
-        - relationship: kafka#consumer-joins-group
-        - relationship: kafka#assignor-computes-assignment
-        - relationship: kafka#coordinator-delivers-assignment
-        - relationship: kafka#consumer-fetches-records
-        - relationship: kafka#consumer-commits-offsets
-        - relationship: kafka#coordinator-manages-offsets
+        - relationship: consumer-joins-group
+        - relationship: assignor-computes-assignment
+        - relationship: coordinator-delivers-assignment
+        - relationship: consumer-fetches-records
+        - relationship: consumer-commits-offsets
+        - relationship: coordinator-manages-offsets

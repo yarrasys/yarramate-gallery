@@ -3,14 +3,14 @@ id: consumer-group-coordination
 version: "1.0"
 query:
   subjects:
-    - kafka#consumer-application
-    - kafka#consumer-client
-    - kafka#group-coordinator
-    - kafka#consumer-group
-    - kafka#partition-assignor
-    - kafka#topic-partition
-    - kafka#broker
-    - kafka#consumer-offsets
+    - consumer-application
+    - consumer-client
+    - group-coordinator
+    - consumer-group
+    - partition-assignor
+    - topic-partition
+    - broker
+    - consumer-offsets
   relationships: between
 presentation:
   title: Consumer-group coordination

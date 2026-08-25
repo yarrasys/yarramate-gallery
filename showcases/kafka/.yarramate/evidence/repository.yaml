@@ -4,354 +4,354 @@ version: "1.0"
 provider: repository-inspection
 observations:
   # --- Concepts ---
-  - subject: kafka#producer-application
+  - subject: producer-application
     result: confirmed
     evidence:
       uri: repo:README.md
       message: README describes Kafka as an event streaming platform that producers publish to; the actor itself is an interpretation (the repo ships only the client library).
-  - subject: kafka#consumer-application
+  - subject: consumer-application
     result: confirmed
     evidence:
       uri: repo:README.md
       message: README describes consumers subscribing to topics; the actor itself is an interpretation (the repo ships only the client library).
-  - subject: kafka#producer-client
+  - subject: producer-client
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/producer/KafkaProducer.java
       message: KafkaProducer holds accumulator (RecordAccumulator) and sender (Sender); send(ProducerRecord) at :959 buffers into the accumulator.
-  - subject: kafka#consumer-client
+  - subject: consumer-client
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/KafkaConsumer.java
       message: KafkaConsumer is a facade over a ConsumerDelegate; poll/subscribe/commitSync forward to it.
-  - subject: kafka#partition-assignor
+  - subject: partition-assignor
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/CooperativeStickyAssignor.java
       message: CooperativeStickyAssignor extends AbstractStickyAssignor; COOPERATIVE_STICKY_ASSIGNOR_NAME = "cooperative-sticky".
-  - subject: kafka#kafka-cluster
+  - subject: kafka-cluster
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaRaftServer.scala
       message: KafkaRaftServer constructs BrokerServer and/or ControllerServer from config.processRoles over a single SharedServer.
-  - subject: kafka#broker
+  - subject: broker
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/BrokerServer.scala
       message: BrokerServer extends KafkaBroker; startup builds LogManager, ReplicaManager, AlterPartitionManager, SocketServer, KafkaApis and the group coordinator.
-  - subject: kafka#controller
+  - subject: controller
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ControllerServer.scala
       message: ControllerServer builds a KRaftMetadataCache and a QuorumController (new QuorumController.Builder().setRaftClient(...).build()).
-  - subject: kafka#controller-quorum
+  - subject: controller-quorum
     result: confirmed
     evidence:
       uri: repo:raft/src/main/java/org/apache/kafka/raft/QuorumState.java
       message: QuorumState holds the voter set (via KRaftControlRecordStateMachine) and the Resigned/Unattached/Prospective/Candidate/Leader/Follower state machine.
-  - subject: kafka#raft-consensus
+  - subject: raft-consensus
     result: confirmed
     evidence:
       uri: repo:raft/src/main/java/org/apache/kafka/raft/KafkaRaftClient.java
       message: 'public final class KafkaRaftClient<T> implements RaftClient<T> at :169; javadoc: a Kafkaesque Raft where election is pure Raft but replication is follower-pull.'
-  - subject: kafka#replica-manager
+  - subject: replica-manager
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaManager.scala
       message: ReplicaManager holds allPartitions, delayedProducePurgatory/delayedFetchPurgatory, replicaFetcherManager; appendRecords, fetchMessages, maybeShrinkIsr.
-  - subject: kafka#log-manager
+  - subject: log-manager
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/log/LogManager.scala
       message: Scala class LogManager manages currentLogs/futureLogs across live log dirs; getOrCreateLog, loadLogs, startup, shutdown.
-  - subject: kafka#group-coordinator
+  - subject: group-coordinator
     result: confirmed
     evidence:
       uri: repo:group-coordinator/src/main/java/org/apache/kafka/coordinator/group/GroupCoordinatorService.java
       message: GroupCoordinatorService implements GroupCoordinator at :162; consumerGroupHeartbeat/joinGroup/syncGroup/heartbeat; per-group shard routing.
-  - subject: kafka#replica-fetcher
+  - subject: replica-fetcher
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaFetcherThread.scala
       message: ReplicaFetcherThread extends AbstractFetcherThread; processPartitionData appends via appendRecordsToFollowerOrFutureReplica then log.maybeUpdateHighWatermark.
-  - subject: kafka#metadata-publisher
+  - subject: metadata-publisher
     result: confirmed
     evidence:
       uri: repo:metadata/src/main/java/org/apache/kafka/image/loader/MetadataLoader.java
       message: MetadataLoader implements RaftClient.Listener; handleCommit builds MetadataDelta/MetadataImage; maybePublishMetadata fans out to publishers.
-  - subject: kafka#topic
+  - subject: topic
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaApis.scala
       message: Topics are created/managed through request handlers (handleCreateTopics); the topic is a logical grouping of partitions.
-  - subject: kafka#topic-partition
+  - subject: topic-partition
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/cluster/Partition.scala
       message: class Partition manages leader/follower replicas, ISR and HW; partitionState holds isr and leader; appendRecordsToLeader, inSyncReplicaIds.
-  - subject: kafka#in-sync-replica-set
+  - subject: in-sync-replica-set
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/cluster/Partition.scala
       message: getOutOfSyncReplicas, maybeShrinkIsr, prepareIsrShrink, prepareIsrExpand manage the in-sync replica set.
-  - subject: kafka#high-watermark
+  - subject: high-watermark
     result: confirmed
     evidence:
       uri: repo:storage/src/main/java/org/apache/kafka/storage/internals/log/UnifiedLog.java
       message: volatile highWatermarkMetadata; maybeIncrementHighWatermark (leader, monotonic) and maybeUpdateHighWatermark (follower).
-  - subject: kafka#record
+  - subject: record
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/producer/ProducerRecord.java
       message: ProducerRecord carries key, value, timestamp and headers; produced and consumed as MemoryRecords batches.
-  - subject: kafka#partition-log
+  - subject: partition-log
     result: confirmed
     evidence:
       uri: repo:storage/src/main/java/org/apache/kafka/storage/internals/log/UnifiedLog.java
       message: UnifiedLog appendAsLeader/appendAsFollower append to the active LocalLog segment; roll() rolls segments.
-  - subject: kafka#log-segment
+  - subject: log-segment
     result: confirmed
     evidence:
       uri: repo:storage/src/main/java/org/apache/kafka/storage/internals/log/LogSegment.java
       message: LogSegment holds FileRecords log, LazyIndex offset/time indexes; append writes batches and adds index entries.
-  - subject: kafka#metadata-log
+  - subject: metadata-log
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/common/internals/Topic.java
       message: CLUSTER_METADATA_TOPIC_NAME = "__cluster_metadata"; CLUSTER_METADATA_TOPIC_PARTITION = partition 0.
-  - subject: kafka#cluster-metadata-cache
+  - subject: cluster-metadata-cache
     result: confirmed
     evidence:
       uri: repo:metadata/src/main/java/org/apache/kafka/metadata/KRaftMetadataCache.java
       message: KRaftMetadataCache holds a volatile MetadataImage; setImage swaps it; getTopicMetadata/describeTopicResponse read it.
-  - subject: kafka#consumer-group
+  - subject: consumer-group
     result: confirmed
     evidence:
       uri: repo:group-coordinator/src/main/java/org/apache/kafka/coordinator/group/Group.java
       message: Group models consumer-group membership and state; GroupCoordinatorService manages group lifecycle.
-  - subject: kafka#consumer-offsets
+  - subject: consumer-offsets
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/common/internals/Topic.java
       message: GROUP_METADATA_TOPIC_NAME = "__consumer_offsets"; the compacted offsets topic.
 
   # --- Composition claims ---
-  - claim: kafka#cluster-composes-controller-quorum
+  - claim: cluster-composes-controller-quorum
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaRaftServer.scala
       message: Constructs an Option[ControllerServer] when process.roles contains ControllerRole.
-  - claim: kafka#cluster-composes-broker
+  - claim: cluster-composes-broker
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaRaftServer.scala
       message: Constructs an Option[BrokerServer] when process.roles contains BrokerRole.
-  - claim: kafka#cluster-composes-metadata-log
+  - claim: cluster-composes-metadata-log
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaRaftServer.scala
       message: Companion defines MetadataTopic = Topic.CLUSTER_METADATA_TOPIC_NAME, MetadataPartition, MetadataTopicId.
-  - claim: kafka#broker-composes-replica-manager
+  - claim: broker-composes-replica-manager
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/BrokerServer.scala
       message: startup builds the ReplicaManager wired with alterPartitionManager.
-  - claim: kafka#broker-composes-log-manager
+  - claim: broker-composes-log-manager
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/BrokerServer.scala
       message: startup builds the LogManager.
-  - claim: kafka#broker-composes-group-coordinator
+  - claim: broker-composes-group-coordinator
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaBroker.scala
       message: KafkaBroker declares def groupCoordinator.
-  - claim: kafka#broker-composes-metadata-cache
+  - claim: broker-composes-metadata-cache
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/BrokerServer.scala
       message: metadataCache = new KRaftMetadataCache(config.nodeId, ...).
-  - claim: kafka#broker-composes-replica-fetcher
+  - claim: broker-composes-replica-fetcher
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaFetcherManager.scala
       message: ReplicaFetcherManager.createFetcherThread builds a ReplicaFetcherThread per source broker on the broker.
-  - claim: kafka#log-manager-composes-partition-log
+  - claim: log-manager-composes-partition-log
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/log/LogManager.scala
       message: getOrCreateLog creates/retrieves the UnifiedLog for a TopicPartition.
-  - claim: kafka#partition-log-composes-segment
+  - claim: partition-log-composes-segment
     result: confirmed
     evidence:
       uri: repo:storage/src/main/java/org/apache/kafka/storage/internals/log/UnifiedLog.java
       message: UnifiedLog appends to the active LogSegment; roll() starts a new segment.
-  - claim: kafka#topic-composes-partition
+  - claim: topic-composes-partition
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/cluster/Partition.scala
       message: Partition is keyed by TopicPartition (topic, partition index).
-  - claim: kafka#controller-composes-raft
+  - claim: controller-composes-raft
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/raft/KafkaRaftManager.scala
       message: KafkaRaftManager.buildRaftClient constructs new KafkaRaftClient(raftLog); ControllerServer uses sharedServer.raftManager.client.
-  - claim: kafka#controller-composes-metadata-cache
+  - claim: controller-composes-metadata-cache
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ControllerServer.scala
       message: metadataCache = new KRaftMetadataCache(config.nodeId, ...).
-  - claim: kafka#producer-app-composes-producer-client
+  - claim: producer-app-composes-producer-client
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/producer/KafkaProducer.java
       message: Producer applications instantiate the KafkaProducer client library; the application actor is an interpretation.
-  - claim: kafka#consumer-app-composes-consumer-client
+  - claim: consumer-app-composes-consumer-client
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/KafkaConsumer.java
       message: Consumer applications instantiate the KafkaConsumer client library; the application actor is an interpretation.
-  - claim: kafka#consumer-app-composes-assignor
+  - claim: consumer-app-composes-assignor
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/CooperativeStickyAssignor.java
       message: The partition assignor is a client-side plug-in loaded by the consumer application.
 
   # --- Aggregation claims ---
-  - claim: kafka#quorum-aggregates-controller
+  - claim: quorum-aggregates-controller
     result: confirmed
     evidence:
       uri: repo:raft/src/main/java/org/apache/kafka/raft/QuorumState.java
       message: QuorumState tracks the voter set; the voters elect one leader (the active controller).
-  - claim: kafka#group-aggregates-consumer
+  - claim: group-aggregates-consumer
     result: confirmed
     evidence:
       uri: repo:group-coordinator/src/main/java/org/apache/kafka/coordinator/group/Group.java
       message: Group aggregates its consumer members and their assignments.
 
   # --- Access claims ---
-  - claim: kafka#raft-replicates-metadata-log
+  - claim: raft-replicates-metadata-log
     result: confirmed
     evidence:
       uri: repo:raft/src/main/java/org/apache/kafka/raft/KafkaRaftClient.java
       message: prepareAppend/append write into the leader BatchAccumulator; handleFetchRequest serves committed records to followers.
-  - claim: kafka#controller-writes-metadata-log
+  - claim: controller-writes-metadata-log
     result: confirmed
     evidence:
       uri: repo:metadata/src/main/java/org/apache/kafka/controller/QuorumController.java
       message: The Raft leader of the metadata log is the active QuorumController; raftClient.register(metaLogListener) replays/commits records.
-  - claim: kafka#broker-manages-partition
+  - claim: broker-manages-partition
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaManager.scala
       message: allPartitions ConcurrentHashMap[TopicPartition, HostedPartition[Partition]]; becomeLeaderOrfollower transitions leader/follower.
-  - claim: kafka#replica-manager-manages-replicas
+  - claim: replica-manager-manages-replicas
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaManager.scala
       message: appendRecords -> appendRecordsToLeader, fetchMessages drive the hosted partition replicas.
-  - claim: kafka#replica-manager-manages-isr
+  - claim: replica-manager-manages-isr
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaManager.scala
       message: maybeShrinkIsr scheduled every replicaLagTimeMaxMs/2; delegates to Partition.maybeShrinkIsr/getOutOfSyncReplicas.
-  - claim: kafka#replica-manager-manages-hw
+  - claim: replica-manager-manages-hw
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/cluster/Partition.scala
       message: maybeIncrementLeaderHW computes HW as min LEO over maximalIsr and applies via leaderLog.maybeIncrementHighWatermark.
-  - claim: kafka#coordinator-manages-group
+  - claim: coordinator-manages-group
     result: confirmed
     evidence:
       uri: repo:group-coordinator/src/main/java/org/apache/kafka/coordinator/group/GroupCoordinatorService.java
       message: Manages group membership, heartbeat, and assignment via per-group shards.
-  - claim: kafka#coordinator-manages-offsets
+  - claim: coordinator-manages-offsets
     result: confirmed
     evidence:
       uri: repo:group-coordinator/src/main/java/org/apache/kafka/coordinator/group/OffsetMetadataManager.java
       message: commitOffset appends an OffsetCommitKey/Value record to __consumer_offsets; replays on load.
-  - claim: kafka#broker-reads-metadata-cache
+  - claim: broker-reads-metadata-cache
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/BrokerServer.scala
       message: metadataCache (KRaftMetadataCache) supplies leader/ISR placement read by KafkaApis to route requests.
-  - claim: kafka#controller-manages-partitions
+  - claim: controller-manages-partitions
     result: confirmed
     evidence:
       uri: repo:metadata/src/main/java/org/apache/kafka/metadata/PartitionRegistration.java
       message: PartitionRegistration carries replicas, isr, leader, leaderEpoch, partitionEpoch; merged via PartitionChangeRecord in the metadata log.
-  - claim: kafka#assignor-reads-partitions
+  - claim: assignor-reads-partitions
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java
       message: onLeaderElected runs assignor.assign over the subscribed partitions at :691.
 
   # --- Produce path claims ---
-  - claim: kafka#producer-sends-records
+  - claim: producer-sends-records
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java
       message: sendProduceRequest builds a ProduceRequest (ProduceRequestData.setAcks(acks)) and client.send to the leader node.
-  - claim: kafka#broker-appends-log
+  - claim: broker-appends-log
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/KafkaApis.scala
       message: handleProduceRequest routes authorized records to replicaManager.handleProduceAppend -> appendRecords -> appendRecordsToLeader.
-  - claim: kafka#log-appends-segment
+  - claim: log-appends-segment
     result: confirmed
     evidence:
       uri: repo:storage/src/main/java/org/apache/kafka/storage/internals/log/UnifiedLog.java
       message: UnifiedLog.append writes to the active LogSegment, assigning offsets and updating offset/time indexes.
-  - claim: kafka#broker-replicates-followers
+  - claim: broker-replicates-followers
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/ReplicaFetcherThread.scala
       message: processPartitionData appends the leader's records via appendRecordsToFollowerOrFutureReplica on the follower.
-  - claim: kafka#broker-acks-producer
+  - claim: broker-acks-producer
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/producer/ProducerConfig.java
       message: ACKS_CONFIG = "acks", default "all", validator in("all","-1","0","1"); with acks=all the leader waits for the ISR (delayedProducePurgatory).
-  - claim: kafka#replica-manager-alterpartition
+  - claim: replica-manager-alterpartition
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/AlterPartitionManager.scala
       message: submit enqueues ISR updates; sendRequest builds an AlterPartitionRequest to the controller via NodeToControllerChannelManager.
 
   # --- Consumer-group coordination claims ---
-  - claim: kafka#consumer-joins-group
+  - claim: consumer-joins-group
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/AbstractCoordinator.java
       message: ensureActiveGroup drives the join->sync loop; sendJoinGroupRequest issues JoinGroup; pollHeartbeat keeps the member alive.
-  - claim: kafka#assignor-computes-assignment
+  - claim: assignor-computes-assignment
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java
       message: onLeaderElected at :645 runs assignor.assign at :691 to compute the group partition assignment.
-  - claim: kafka#coordinator-delivers-assignment
+  - claim: coordinator-delivers-assignment
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/AbstractCoordinator.java
       message: ensureActiveGroup completes with the SyncGroup response carrying each member's assignment.
-  - claim: kafka#consumer-fetches-records
+  - claim: consumer-fetches-records
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/Fetcher.java
       message: sendFetches builds a FetchRequest per leader node; collectFetch returns records via the FetchCollector.
-  - claim: kafka#consumer-commits-offsets
+  - claim: consumer-commits-offsets
     result: confirmed
     evidence:
       uri: repo:clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java
       message: sendOffsetCommitRequest at :1272 commits offsets; maybeAutoCommitOffsetsAsync at :1198.
 
   # --- Metadata pipeline claims ---
-  - claim: kafka#metadata-log-to-publisher
+  - claim: metadata-log-to-publisher
     result: confirmed
     evidence:
       uri: repo:metadata/src/main/java/org/apache/kafka/image/loader/MetadataLoader.java
       message: MetadataLoader (a RaftClient.Listener) handleCommit consumes committed batches into MetadataDelta/MetadataImage.
-  - claim: kafka#publisher-updates-cache
+  - claim: publisher-updates-cache
     result: confirmed
     evidence:
       uri: repo:core/src/main/scala/kafka/server/metadata/BrokerMetadataPublisher.scala

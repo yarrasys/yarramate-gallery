@@ -28,17 +28,17 @@
   ],
   "digests": {
     "likec4.config.json": "62fce73b2285141c5c511e1f90e1a985baf23470ac1046611b14166176876171",
-    "model.likec4": "cf6ff98fc4129ea800f414c8ebda7db3c5394fd086bf3fb58a92198bb5de88c2",
+    "model.likec4": "c5356247f972dd02a09ce0adc410347e6120a780760059fef39ebdb504d3f655",
     "specification.likec4": "58e4f27b9d47614b8b3add6fa4f6655e8ca509e1b450b0705a3fe66211b1fe46"
   },
   "inputDigests": {
-    ".yarramate/architecture/kafka.yaml": "df8a5976fc8270835e62d2b662ca2978e69e56f6081853f8ed3e2a17b8997d37",
-    ".yarramate/likec4-project.yaml": "19fe44c24eb762d5b66fe6513cb6b349a0c36c63c325d7187b5122b0e56bd2a5",
-    "integrations/likec4/subject-mapping.yaml": "72f187be55b30a95bedb3083403339cd92d2a108f2fab88cf62d7e7d486be301",
-    "projections/consumer-group-coordination.yaml": "543a78b1f9b54beff657ffa85de96c70996fce956b74f6b09c21fa62a43e970d",
-    "projections/metadata-plane.yaml": "98783d47402bd0d29ae258b38685fc84bb977df9b60b3ffd52eb1c3cade9fc7b",
-    "projections/produce-path.yaml": "b05931c6ae8f7e8add8aff9f8f6818115a4d5419ed34c63fdc4799c3b253eaf7",
-    "projections/replication-and-storage.yaml": "4099f5097fa7c4a4d0d82c9d45a67514a1e927607af16c5959911e787173daf6",
-    "projections/system-overview.yaml": "7e3ac919a24858b49dc82d92d6fb3f52d37970c711fb246436d8d39af9f5be54"
+    ".yarramate/architecture/kafka.yaml": "1d6b834a8477d0e92d7b82c2bd53eac9d05e7503e5c6f9e287e90e05fb12dad0",
+    ".yarramate/likec4-project.yaml": "e58cb798717fd7791123ee502e334007b6035711894708e57765741ef9e333d2",
+    "integrations/likec4/subject-mapping.yaml": "32fabb9b24348edd7f0d9ee382740b5569295e44dac91855a508b4827e23e39e",
+    "projections/consumer-group-coordination.yaml": "2cc16c2a4cec606a39308e81c3e5011ac7f428925873910657804b42de4ece7a",
+    "projections/metadata-plane.yaml": "b5d4ef568d88809cac4ac191a1c56ed7a9a40947cb37cb7472491418ae2737e1",
+    "projections/produce-path.yaml": "c4778e77d835fec112f323c3ee80ec548fa5112466703203c24b2afefe1b0765",
+    "projections/replication-and-storage.yaml": "1fb393d83fdcdeb81dfb280d8a7499ccb45abe623b78cda0e76e2a52631ae9b7",
+    "projections/system-overview.yaml": "c7026e7556b8a7df4be6c19421b2d53fa4d26ac563b803b379bc6deb15bfb419"
   }
 }
